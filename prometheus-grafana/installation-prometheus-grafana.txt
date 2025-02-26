@@ -39,12 +39,12 @@ grafana:
     annotations:
       service.beta.kubernetes.io/aws-load-balancer-type: "alb"
       service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
-      service.beta.kubernetes.io/aws-load-balancer-subnets: "subnet-0023ff4bd4ab4e6e6,subnet-025a00cbb2e8f88ac,subnet-0adc595abd8d30780,subnet-0fe8e450bc917d52c"
+      service.beta.kubernetes.io/aws-load-balancer-subnets: "subnet-0023ff4vvbvbbd4ab4e6e6,subnet-025a00cbbgyutyt2e8f88ac,subnet-0adc595abv bvbd8d30780,subnet-0fe8e4frescd50bc917d52c"
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
       alb.ingress.kubernetes.io/scheme: "internet-facing"
       alb.ingress.kubernetes.io/target-type: "ip"
-  adminUser: "admin"          # Specify the admin username
-  adminPassword: "Spark@123"  # Specify a permanent password
+  adminUser: ""          # Specify the admin username
+  adminPassword: ""  # Specify a permanent password
 
   loki:
     config:
