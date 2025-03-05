@@ -1,0 +1,329 @@
+# git lab installation 
+https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-gitlab-on-ubuntu
+
+
+
+services:
+  gitlab:
+    image: gitlab/gitlab-ee:latest
+    restart: always
+    hostname: 'gitlab.eficensittest.com' # Change to your domain
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'https://gitlab.eficensittest.com' # Change to your domain
+        letsencrypt['enable'] = true
+        letsencrypt['contact_emails'] = ['b.manmadharao207@gmail.com'] # Correct the email format
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - gitlab-config:/etc/gitlab
+      - gitlab-logs:/var/log/gitlab
+      - gitlab-data:/var/opt/gitlab
+
+volumes:
+  gitlab-config:
+  gitlab-logs:
+  gitlab-data:
+--------------------------------------------------
+
+
+
+services:
+  gitlab:
+    image: gitlab/gitlab-ee:latest
+    restart: always
+    hostname: 'gitlab.eficensittest.com' # Change to your domain
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://gitlab.eficensittest.com' # Change to your domain
+        letsencrypt['enable'] = false # Disable Let's Encrypt if using Nginx for SSL
+    ports:
+      - '8081:80'  # Change GitLab internal port to 8080
+      - '443:443'  # Keep 443 for HTTPS
+    volumes:
+      - gitlab-config:/etc/gitlab
+      - gitlab-logs:/var/log/gitlab
+      - gitlab-data:/var/opt/gitlab
+
+volumes:
+  gitlab-config:
+  gitlab-logs:
+  gitlab-data:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sudo apt update
+sudo apt install docker.io
+sudo systemctl start docker
+sudo systemctl enable docker
+
+sudo docker run --detach \
+  --publish 1443:443 --publish 8080:80 --publish 1001:22 \
+  --name gitlab \
+  --restart always \
+  --volume gitlab_config:/etc/gitlab \
+  --volume gitlab_logs:/var/log/gitlab \
+  --volume gitlab_data:/var/opt/gitlab \
+  --shm-size 2gb \
+  --env GITLAB_OMNIBUS_CONFIG="external_url 'http://gitlab.eficensittest.com:8080'" \
+  gitlab/gitlab-ce:latest
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sudo docker run --detach \
+  --publish 1443:443 --publish 80:80 --publish 1001:22 \
+  --name gitlab \
+  --restart always \
+  --volume gitlab_config:/etc/gitlab \
+  --volume gitlab_logs:/var/log/gitlab \
+  --volume gitlab_data:/var/opt/gitlab \
+  --shm-size 2gb \
+  --env GITLAB_OMNIBUS_CONFIG="external_url 'http://gitlab.eficensittest.com'" \
+  gitlab/gitlab-ce:latest
+
+sudo docker volume ls 
+
+sudo docker volume inspect gitlab_config
+
+---------------------------------------------------------------------------------
+IP address: 185.151.6.57
+Internal IP address: 10.123.16.5
+Username: eficensadmin
+Password: Admin@Eficens2024*
+Opened Port: SSH
+
+
+sudo docker run --detach \
+  --publish 1443:443 --publish 80:80 --publish 1001:22 \
+  --name gitlab \
+  --restart always \
+  --volume gitlab_config:/etc/gitlab \
+  --volume gitlab_logs:/var/log/gitlab \
+  --volume gitlab_data:/var/opt/gitlab \
+  --volume /etc/ssl/certs/gitlab.crt:/etc/gitlab/ssl/gitlab.crt \
+  --volume /etc/ssl/private/gitlab.key:/etc/gitlab/ssl/gitlab.key \
+  --shm-size 2gb \
+  --env GITLAB_OMNIBUS_CONFIG="external_url 'https://gitlab.eficensittest.com'; gitlab_rails['nginx']['ssl_certificate'] = '/etc/gitlab/ssl/gitlab.crt'; gitlab_rails['nginx']['ssl_certificate_key'] = '/etc/gitlab/ssl/gitlab.key';" \
+  gitlab/gitlab-ce:latest
+
+
+sudo docker exec -it gitlab /bin/bash
+
+vim /etc/gitlab/gitlab.rb
+
+letsencrypt['enable'] = true
+letsencrypt['contact_emails'] = ['youremail@example.com']
+letsencrypt['auto_renew'] = true
+letsencrypt['auto_renew_hour'] = 12
+letsencrypt['auto_renew_minute'] = nil
+letsencrypt['auto_renew_day_of_month'] = "*/7"
+letsencrypt['auto_renew_on_initial_setup'] = true
+external_url "https://gitlab.eficensittest.com"
+nginx['ssl_certificate'] = "/etc/gitlab/ssl/gitlab.crt"
+nginx['ssl_certificate_key'] = "/etc/gitlab/ssl/gitlab.key"
+nginx['redirect_http_to_https'] = true
+
+
+sudo chmod 600 /etc/ssl/certs/gitlab.crt
+sudo chmod 600 /etc/ssl/private/gitlab.key
+
+---------------------------------------------------
+# Create a directory for your SSL files
+sudo mkdir -p /path/to/ssl/cert
+
+# Generate a self-signed SSL certificate
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -keyout /etc/ssl/private/gitlab.key \
+  -out /etc/gitlab/ssl/gitlab.crt \
+  -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=gitlab.eficensittest.com"
+
+
+
+
+gitlab-ctl reconfigure
+
+
+cd /var/lib/docker/volumes
+sudo du -sh gitlab_config
+sudo du -sh gitlab_data
+sudo du -sh gitlab_logs
+
+
+
+---------------------------------------------------------------------------------------
+
+
+
+
+
+
+sudo docker run --detach \
+  --publish 1443:443 --publish 80:80 --publish 1001:22 \
+  --name gitlab \
+  --restart always \
+  --volume gitlab_config:/etc/gitlab \
+  --volume gitlab_logs:/var/log/gitlab \
+  --volume gitlab_data:/var/opt/gitlab \
+  --shm-size 2gb \
+  --env GITLAB_OMNIBUS_CONFIG="external_url 'http://gitlab.eficensittest.com'; gitlab_rails['initial_root_password'] = 'Spark@2024'" \
+  gitlab/gitlab-ce:latest
+
+
+
+
+
+ sudo docker run --detach \
+  --publish 1443:443 --publish 80:80 --publish 1001:22 \
+  --name gitlab \
+  --restart always \
+  --volume gitlab_config:/etc/gitlab \
+  --volume gitlab_logs:/var/log/gitlab \
+  --volume gitlab_data:/var/opt/gitlab \
+  --shm-size 2gb \
+  gitlab/gitlab-ce:latest
+
+
+
+
+
+
+
+
+
+
+
+
+-------------------------------------------------------
+version: '3.6'
+services:
+  web:
+    image: 'gitlab/gitlab-ce:latest'
+    container_name: gitlab
+    restart: always
+    ports:
+      - '80:80'
+      - '443:443'
+      - '22:22'
+    volumes:
+      - 'gitlab_config:/etc/gitlab'
+      - 'gitlab_logs:/var/log/gitlab'
+      - 'gitlab_data:/var/opt/gitlab'
+    shm_size: '2gb'
+
+volumes:
+  gitlab_config: {}
+  gitlab_logs: {}
+  gitlab_data: {}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+docker pull bitnami/gitlab:latest
+
+docker run -d --name gitlab -p 80:8080 -p 443:8443 -p 22:8022 \
+   -e GITLAB_ROOT_PASSWORD=your_password \
+   -e GITLAB_HOST=your-domain-or-ip \
+   bitnami/gitlab:latest
+
+
+
+sudo docker run --detach \
+  --hostname gitlab.eficensittest.com \
+  --publish 443:443 --publish 80:80 --publish 22:22 \
+  --name gitlab \
+  --restart always \
+  --volume /srv/gitlab/config:/etc/gitlab \
+  --volume /srv/gitlab/logs:/var/log/gitlab \
+  --volume /srv/gitlab/data:/var/opt/gitlab \
+  gitlab/gitlab-ee:latest
+
+
+
+
+sudo docker run --detach \
+  --hostname gitlab.eficensittest.com \
+  --publish 443:443 --publish 80:80 --publish 2222:22 \
+  --name gitlab \
+  --restart always \
+  --volume /srv/gitlab/config:/etc/gitlab \
+  --volume /srv/gitlab/logs:/var/log/gitlab \
+  --volume /srv/gitlab/data:/var/opt/gitlab \
+  gitlab/gitlab-ee:latest
+

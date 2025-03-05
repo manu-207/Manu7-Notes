@@ -1,0 +1,235 @@
+# pyarmor installation in ubuntu ec2 instance
+
+# Update and install dependencies
+sudo apt update
+sudo apt install software-properties-common
+
+# Add the repository for Python 3.10
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt update
+
+# Install Python 3.10
+sudo apt install python3.10 python3.10-venv python3.10-dev
+
+# Install pip for Python 3.10
+curl -sS https://bootstrap.pypa.io/get-pip.py | sudo python3.10
+
+# Create a virtual environment using Python 3.10
+python3.10 -m venv myenv
+
+# Activate the virtual environment
+source myenv/bin/activate
+
+# Install PyArmor within the virtual environment
+pip install pyarmor
+
+pyarmor reg -p "Spark" "/root/pyarmor-regcode-4556.txt"
+pyarmor reg pyarmor-regfile-4556.zip
+
+pyarmor -v
+
+git clone https://github.com/netsecpros/spark-authentication.git
+
+cd spark-authentication
+
+git checkout -b manu origin/onprem
+
+
+# Now, you can proceed with the PyArmor command
+pyarmor-7 init --entry=manage.py
+
+sudo nano .pyarmor_config
+
+After creating the pyarmor _config file, I removed the .py extension from 'manifest': 'global-include *.py', and it's working fine.
+
+  "manifest": "global-include *",
+
+# build command 
+pyarmor-7 build
+
+
+
+---------------------------------------------------------------
+
+
+
+
+git branch
+
+git rm --cached dist
+rm -rf dist/.git
+git add dist
+git commit -m "Convert dist to a regular folder"
+git push origin main
+
+
+git checkout -b manu
+
+rm -rf !(dist)
+
+
+mv dist/* .
+rm -rf dist/
+git add .
+
+git commit -m "Add files from dist folder to new branch"
+git push origin manu
+
+----------------------------
+
+
+cd dist/
+
+docker build -t manu207/authentication:latest-v27 .
+docker tag manu207/authentication:latest-v27 manu207/spark:authentication-latest-v27
+docker push manu207/spark:authentication-latest-v27
+-------------------------------------------------
+git clone https://github.com/manu-207/spark-masterconfig.git
+cd spark-masterconfig
+git checkout -b onprem origin/main
+git add .
+git commit -m "initial commit"
+git push origin onprem 
+pyarmor-7 init --entry=manage.py
+pyarmor-7 build
+
+git rm --cached dist
+rm -rf dist/.git
+git add dist
+git commit -m "Convert dist to a regular folder"
+git push origin onprem
+
+rm -rf !(dist)
+mv dist/* .
+rm -rf dist/
+git add .
+
+git commit -m "Add files from dist folder to new branch"
+git push origin 
+
+----------------------------
+git clone https://github.com/manu-207/spark-masterconfig.git
+cd spark-masterconfig
+git checkout -b onprem
+git checkout -b pyarmor origin/onprem
+
+pyarmor-7 init --entry=manage.py
+pyarmor-7 build
+
+
+
+git rm --cached dist
+rm -rf dist/.git
+git add dist
+git commit -m "Convert dist to a regular folder"
+git push origin pyarmor
+
+
+rm -rf !(dist)
+mv dist/* .
+rm -rf dist/
+git add .
+
+git commit -m "Add files from dist folder to new branch"
+git push origin pyarmor
+
+-----------------------------------------
+
+
+
+(myenv) root@ip-172-31-20-207:~/spark-authentication# cat .pyarmor_config 
+{
+  "version": "2.1",
+  "name": "spark-authentication",
+  "title": "spark-authentication",
+  "src": ".",
+  "is_package": null,
+  "manifest": "global-include *",
+  "entry": "manage.py",
+  "output": "dist",
+  "runtime_path": null,
+  "restrict_mode": 1,
+  "obf_code": 1,
+  "obf_mod": 2,
+  "wrap_mode": 1,
+  "advanced_mode": 0,
+  "bootstrap_code": 1,
+  "cross_protection": 1,
+  "mixins": null,
+  "plugins": null,
+  "platform": null,
+  "package_runtime": 1,
+  "enable_suffix": 0,
+  "license_file": null,
+  "build_time": 1726217992.1986508
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sudo apt update
+sudo apt install python3-pip
+
+sudo add-apt-repository universe
+sudo apt update
+sudo apt install python3-pip
+
+sudo apt install python3-venv  # If not already installed
+python3 -m venv myenv
+
+source myenv/bin/activate
+pip install pyarmor
+
+pyarmor reg -p "Spark" "/root/pyarmor-regcode-4556.txt"
+pyarmor reg pyarmor-regfile-4556.zip
+
+pyarmor -v
+
+git clone https://github.com/netsecpros/spark-authentication.git
+
+
+# pyarmor installation
+
+1.pyarmor reg -p "Spark" "C:\Users\abhilash.m.EFICENS\Downloads\pyarmor-regcode-4556 (1).txt" (License Key activated command)
+2.pyarmor reg pyarmor-regfile-4556.zip(After Activated to check the activated or Not)
+3.pyarmor -v (To check the Version)
+
+
+pyarmor-7 init --entry=manage.py(To create pyarmor_config file)
+After creating the pyarmor _config file, I removed the .py extension from 'manifest': 'global-include *.py', and it's working fine.
+2.To convert all Python files in the folders into a distribution, I used pyarmor-7 build, which creates a 'dist' folder in our project.
+
+I have implemented all microservices with port numbers:
+1.Authentication Microservice Portno-8001
+2.Master configuration Microservice Portno-8000
+3.Security scan Microservice Portno-8002
+4.File process Microservice Portno-8003

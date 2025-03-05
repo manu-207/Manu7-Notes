@@ -1,0 +1,153 @@
+ubuntu@ip-172-31-83-189:~$ cat check-license-expiry.sh 
+#!/bin/bash
+
+# Load expiry date from environment variable
+EXPIRY_DATE=$EXPIRY_DATE
+
+# Get current date
+CURRENT_DATE=$(date +"%Y-%m-%d")
+
+# Check if the license is expired
+if [[ "$CURRENT_DATE" > "$EXPIRY_DATE" ]]; then
+  echo "License expired on $EXPIRY_DATE"
+  # You can add actions like sending alerts or updating logs here
+else
+  echo "License is still valid."
+fi
+
+------------------------------------------
+ubuntu@ip-172-31-83-189:~$ cat  licens_cron.yaml 
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: license-expiry-check
+spec:
+  schedule: "0 0 * * *"  # Runs daily at midnight
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: check-license
+            image: manu207/spark:license-latest-v1  # Replace with your actual image
+            envFrom:
+            - secretRef:
+                name: license-secrets  # Importing all key-value pairs from license-secrets
+            command: ["sh", "-c", "./check-license-expiry.sh"]  # Replace with actual check script
+          restartPolicy: OnFailure
+          imagePullSecrets:
+          - name: docker-secrets  # Add this to reference your Docker registry secret
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ubuntu@ip-172-31-83-189:~$ cat check_license.py 
+import os
+from datetime import datetime
+
+# Get license expiry date from environment variable
+expiry_date_str = os.getenv("LICENSE_EXPIRY_DATE")
+if not expiry_date_str:
+    print("No LICENSE_EXPIRY_DATE found!")
+    exit(1)
+
+# Convert the expiry date string to a datetime object
+expiry_date = datetime.strptime(expiry_date_str, "%Y-%m-%d")
+current_date = datetime.now()
+
+# Compare current date with expiry date
+if current_date > expiry_date:
+    print("License expired! Take action!")
+else:
+    print(f"License is valid until {expiry_date}.")
+------------------------
+
+
+ubuntu@ip-172-31-83-189:~$ cat license_cron.yaml 
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: license-expiry-check
+spec:
+  schedule: "0 0 * * *"  # Runs daily at midnight
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: check-license
+            image: manu207/spark:license-latest-v1  # Replace with your actual image
+            env:
+              - name: LICENSE_KEY
+                value: "your-license-key"  # Set your license key here
+              - name: EXPIRY_DATE
+                value: "2024-10-14"  # Set the license expiry date
+            envFrom:
+            - secretRef:
+                name: docker-secrets  # Importing all key-value pairs from docker-secrets
+            command: ["sh", "-c", "./check-license-expiry.sh"]  # Replace with actual check script
+          restartPolicy: OnFailure
+          imagePullSecrets:
+          - name: docker-secrets  # Add this to reference your secret
+---------------------------------------
+
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: license-expiry-check
+spec:
+  schedule: "0 0 * * *"  # Runs daily at midnight
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: check-license
+            image: manu207/spark:license-latest-v1  # Replace with your actual image
+            envFrom:
+            - secretRef:
+                name: license-secrets  # Importing all key-value pairs from license-secrets
+            command: ["sh", "-c", "./check-license-expiry.sh"]  # Replace with actual check script
+          restartPolicy: OnFailure
+          imagePullSecrets:
+          - name: docker-secrets  # Add this to reference your Docker registry secret
+--------------------------------
+ubuntu@ip-172-31-83-189:~$ cat licens-secretes.yaml 
+apiVersion: v1
+kind: Secret
+metadata:
+  name: license-secrets
+type: Opaque
+data:
+  LICENSE_KEY: c3Bhcmstc2VjcmV0LWxpY2Vuc2Uta2V5
+  EXPIRY_DATE: MjAyNC0xMC0yMw==
+
+
+
+
+--------------
+
+kubectl create secret generic license-secrets \
+  --from-literal=LICENSE_KEY="spark-secret-license-key" \
+  --from-literal=EXPIRY_DATE="2024-10-23"
+
+

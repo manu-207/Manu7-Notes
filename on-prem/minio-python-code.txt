@@ -1,0 +1,35 @@
+from minio import Minio
+from minio.error import S3Error
+
+# Replace with your private server's IP address and MinIO port
+client = Minio(
+    "private-server-ip:9001",  # Use the private IP address here
+    access_key="dALHa0thaMf77gTEtuYK",
+    secret_key="IPeihCVlbpEZrmj2Sect6iALCrzmjC1AK4aDkNy7",
+    secure=False  # Set to True if you configured HTTPS for MinIO
+)
+
+# Create a bucket if it doesn't exist
+bucket_name = "mybucket"
+if not client.bucket_exists(bucket_name):
+    client.make_bucket(bucket_name)
+    print(f"Bucket '{bucket_name}' created.")
+else:
+    print(f"Bucket '{bucket_name}' already exists.")
+
+# Upload a file to the bucket
+file_path = "/path/to/your/file.txt"
+object_name = "file.txt"
+
+try:
+    client.fput_object(bucket_name, object_name, file_path)
+    print(f"'{object_name}' uploaded to bucket '{bucket_name}'.")
+except S3Error as e:
+    print("File upload error:", e)
+
+# Download the file from the bucket
+try:
+    client.fget_object(bucket_name, object_name, f"downloaded_{object_name}")
+    print(f"'{object_name}' downloaded successfully.")
+except S3Error as e:
+    print("File download error:", e)

@@ -1,0 +1,90 @@
+topic-prod
+prod-group
+
+~/kafka/bin/kafka-topics.sh --bootstrap-server 10.0.23.207:9092 --create --topic topic-prod --replication-factor 1 --partitions 8
+~/kafka/bin/kafka-topics.sh --bootstrap-server 10.0.23.207:9092 --describe --topic topic-prod
+~/kafka/bin/kafka-console-consumer.sh --bootstrap-server 10.0.23.207:9092 --topic topic-prod --group prod-group
+~/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 10.0.23.207:9092 --list
+~/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 10.0.23.207:9092 --group prod-group --describe
+---------
+topic-token-prod
+prod-token-group
+
+~/kafka/bin/kafka-topics.sh --bootstrap-server 10.0.23.207:9092 --create --topic topic-token-prod --replication-factor 1 --partitions 8
+~/kafka/bin/kafka-topics.sh --bootstrap-server 10.0.23.207:9092 --describe --topic topic-token-prod
+~/kafka/bin/kafka-console-consumer.sh --bootstrap-server 10.0.23.207:9092 --topic topic-token-prod --group prod-token-group
+~/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 10.0.23.207:9092 --list
+~/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 10.0.23.207:9092 --group prod-token-group --describe
+
+-------
+topic-prod-myscans
+myscans-prod-group
+
+~/kafka/bin/kafka-topics.sh --bootstrap-server 10.0.23.207:9092 --create --topic topic-prod-myscans --replication-factor 1 --partitions 8
+~/kafka/bin/kafka-topics.sh --bootstrap-server 10.0.23.207:9092 --describe --topic topic-prod-myscans
+~/kafka/bin/kafka-console-consumer.sh --bootstrap-server 10.0.23.207:9092 --topic topic-prod-myscans --group myscans-prod-group
+~/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 10.0.23.207:9092 --list
+~/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 10.0.23.207:9092 --group myscans-prod-group --describe
+
+
+----------
+
+sudo ~/kafka/bin/zookeeper-server-stop.sh
+sudo ~/kafka/bin/zookeeper-server-start.sh -daemon ~/kafka/config/zookeeper.properties
+tail -n 10 ~/kafka/logs/zookeeper.out
+------------------------------------------
+sudo ~/kafka/bin/kafka-server-stop.sh
+sudo ~/kafka/bin/kafka-server-start.sh -daemon ~/kafka/config/server.properties
+tail -n 10 ~/kafka/logs/kafkaServer.out
+
+
+~/kafka/bin/kafka-topics.sh --bootstrap-server 10.0.23.207:9092 --list
+
+~/kafka/bin/kafka-consumer-groups.sh --bootstrap-server 10.0.23.207:9092 --list
+
+--------------------------------------------
+
+
+
+KAFKA_CONSUMER_GROUP=prod-group
+
+KAFKA_TOPIC_PREFIX=topic-prod
+-------------------------------
+ 
+KAFKA_CONSUMER_GROUP=my-group
+
+KAFKA_TOPIC_PREFIX=topic-prod
+
+KAFKA_TOPIC_TOKEN=topic-token-prod
+
+TOKEN_CONSUMER_GROUP=prod-token-group
+
+authenyication
+-----------------------
+
+ 
+KAFKA_CONSUMER_GROUP=my-group
+
+KAFKA_TOPIC_PREFIX=topic-prod
+
+KAFKA_TOPIC_MYSCANS=topic-prod-myscans
+
+MYSCANS_CONSUMER_GROUP=myscans-prod-group
+fileprocess
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

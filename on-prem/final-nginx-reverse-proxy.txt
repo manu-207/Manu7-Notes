@@ -1,0 +1,183 @@
+# nginx as reverse proxy server 
+
+sudo apt update
+sudo apt install nginx
+sudo nano /etc/nginx/sites-available/reverse-proxy.conf
+
+
+sudo rm /etc/nginx/sites-enabled/reverse-proxy.conf
+
+sudo ln -s /etc/nginx/sites-available/reverse-proxy.conf /etc/nginx/sites-enabled/
+
+sudo nginx -t
+sudo systemctl restart nginx
+sudo apt install python3-certbot-nginx
+sudo certbot --nginx
+sudo systemctl restart nginx
+sudo systemctl status certbot.timer
+ 
+sudo apt install certbot python3-certbot-nginx
+sudo certbot --nginx -d spark.eficensittest.com
+
+
+
+server {
+    server_name spark.eficensittest.com;
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/kong.eficensittest.com-0001/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/kong.eficensittest.com-0001/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+    location / {
+        proxy_pass http://10.0.23.207:31528;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /api/ {
+        rewrite ^/api/(.*) /$1 break;
+
+        proxy_pass http://localhost:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 90s;
+        proxy_buffering on;
+    }
+
+    location /websocket/ {
+        rewrite ^/websocket/(.*) /$1 break;
+
+        proxy_pass http://10.0.23.207:30141;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 90s;
+        proxy_buffering on;
+    }
+}
+
+# Configuration for spark-masterconfig.eficensittest.com
+server {
+    listen 80;
+    server_name spark-masterconfig.eficensittest.com;
+
+    location / {
+        proxy_pass http://10.0.23.207:31154;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# Configuration for spark-scheduler.eficensittest.com
+server {
+    listen 80;
+    server_name spark-scheduler.eficensittest.com;
+
+    location / {
+        proxy_pass http://10.0.23.207:30880;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# Configuration for spark-fileprocess.eficensittest.com
+server {
+    listen 80;
+    server_name spark-fileprocess.eficensittest.com;
+
+    location / {
+        proxy_pass http://10.0.23.207:32678;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# Configuration for spark-scansearch.eficensittest.com
+server {
+    listen 80;
+    server_name spark-scansearch.eficensittest.com;
+
+    location / {
+        proxy_pass http://10.0.23.207:31964;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# Configuration for spark-authentication.eficensittest.com
+server {
+    listen 80;
+    server_name spark-authentication.eficensittest.com;
+
+    location / {
+        proxy_pass http://10.0.23.207:32345;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# Configuration for spark-securityscan.eficensittest.com
+server {
+    listen 80;
+    server_name spark-securityscan.eficensittest.com;
+
+    location / {
+        proxy_pass http://10.0.23.207:31121;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# Configuration for spark-eventsnotification.eficensittest.com
+server {
+    listen 80;
+    server_name spark-eventsnotification.eficensittest.com;
+
+    location / {
+        proxy_pass http://10.0.23.207:30464;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+
+
+# Redirect HTTP to HTTPS for specific domains
+server {
+    if ($host = kong.eficensittest.com) {
+        return 301 https://$host$request_uri;
+    }
+    listen 80;
+    server_name kong.eficensittest.com;
+    return 404; # managed by Certbot
+}
+
+server {
+    if ($host = spark.eficensittest.com) {
+        return 301 https://$host$request_uri;
+    }
+    listen 80;
+    server_name spark.eficensittest.com;
+    return 404; # managed by Certbot
+}

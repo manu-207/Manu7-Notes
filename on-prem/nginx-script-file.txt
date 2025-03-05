@@ -1,0 +1,150 @@
+#!/bin/bash
+
+# Prompt the user to enter the domain name
+read -p "Enter your domain name (e.g., yourdomain.com): " DOMAIN_NAME
+
+# Prompt the user to enter the IP address
+read -p "Enter the IP address (e.g., 10.0.27.110): " IP_ADDRESS
+
+# Prompt the user to enter the port number for the main domain
+read -p "Enter the port for the domain (e.g., 30471): " PORT_DOMAIN
+
+# Prompt the user to enter the port number for WebSocket
+read -p "Enter the port for WebSocket (e.g., 30141): " PORT_WEBSOCKET
+
+# Check if all inputs were provided
+if [ -z "$DOMAIN_NAME" ] || [ -z "$IP_ADDRESS" ] || [ -z "$PORT_DOMAIN" ] || [ -z "$PORT_WEBSOCKET" ]; then
+  echo "Domain name, IP address, or port numbers not provided. Exiting."
+  exit 1
+fi
+
+# Define the Nginx configuration file path
+NGINX_CONF_PATH="/etc/nginx/sites-available/reverse-proxy.conf"
+
+# Create the Nginx configuration file with the provided domain name, IP, and ports
+sudo tee $NGINX_CONF_PATH > /dev/null <<EOL
+server {
+    server_name $DOMAIN_NAME;
+
+    location / {
+        proxy_pass http://$IP_ADDRESS:$PORT_DOMAIN;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+
+    location /api/ {
+        rewrite ^/api/(.*) /\$1 break;
+        proxy_pass http://localhost:8000\$request_uri;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_read_timeout 90s;
+        proxy_buffering on;
+    }
+
+    location /websocket/ {
+        rewrite ^/websocket/(.*) /\$1 break;
+        proxy_pass http://$IP_ADDRESS:$PORT_WEBSOCKET;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_read_timeout 90s;
+        proxy_buffering on;
+    }
+
+    listen 80;
+}
+EOL
+
+# Enable the configuration by creating a symlink
+sudo ln -s $NGINX_CONF_PATH /etc/nginx/sites-enabled/
+
+# Test Nginx configuration for syntax errors
+sudo nginx -t
+
+# Reload Nginx to apply changes
+sudo systemctl reload nginx
+
+echo "Nginx configuration for $DOMAIN_NAME with IP $IP_ADDRESS and ports $PORT_DOMAIN (domain) and $PORT_WEBSOCKET (WebSocket) has been set up and Nginx has been reloaded."
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-----------------------------------------
+#!/bin/bash
+
+# Prompt the user to enter the domain name
+read -p "Enter your domain name (e.g., yourdomain.com): " DOMAIN_NAME
+
+# Check if a domain name was provided
+if [ -z "$DOMAIN_NAME" ]; then
+  echo "No domain name provided. Exiting."
+  exit 1
+fi
+
+# Define the Nginx configuration file path
+NGINX_CONF_PATH="/etc/nginx/sites-available/reverse-proxy.conf"
+
+# Create the Nginx configuration file with the provided domain name
+sudo tee $NGINX_CONF_PATH > /dev/null <<EOL
+server {
+    server_name $DOMAIN_NAME;
+
+    location / {
+        proxy_pass http://10.0.27.110:30471;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+
+    location /api/ {
+        rewrite ^/api/(.*) /\$1 break;
+        proxy_pass http://localhost:8000\$request_uri;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_read_timeout 90s;
+        proxy_buffering on;
+    }
+
+    location /websocket/ {
+        rewrite ^/websocket/(.*) /\$1 break;
+        proxy_pass http://10.0.27.110:30141;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_read_timeout 90s;
+        proxy_buffering on;
+    }
+
+    listen 80;
+}
+EOL
+
+# Enable the configuration by creating a symlink
+sudo ln -s $NGINX_CONF_PATH /etc/nginx/sites-enabled/
+
+# Test Nginx configuration for syntax errors
+sudo nginx -t
+
+# Reload Nginx to apply changes
+sudo systemctl reload nginx
+
+echo "Nginx configuration for $DOMAIN_NAME has been set up and Nginx has been reloaded."
