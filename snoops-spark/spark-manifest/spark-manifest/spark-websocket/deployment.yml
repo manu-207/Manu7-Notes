@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-websocket
+  labels:
+    app: spark-websocket
+    Platform: spark
+  namespace: spark
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spark-websocket
+  template:
+    metadata:
+      labels:
+        app: spark-websocket
+    spec:
+      serviceAccountName: spark
+      containers:
+      - name: spark-websocket
+        image: 424258464218.dkr.ecr.us-east-1.amazonaws.com/spark-websocket:latest
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 500m
+            memory: 4Gi
+        env:
+        - name: project_env
+          value: prod
+        - name: project_name
+          value: spark-websocket
+        - name: env_name
+          value: prod
+        envFrom:
+          - secretRef:
+              name: spark-websocket-secrets
+

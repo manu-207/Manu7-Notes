@@ -1,0 +1,62 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-scansearch
+  labels:
+    app: spark-scansearch
+    Platform: spark
+  namespace: spark
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: spark-scansearch
+  template:
+    metadata:
+      labels:
+        app: spark-scansearch
+    spec:
+      serviceAccountName: spark
+      containers:
+      - name: spark-scansearch
+        image: 424258464218.dkr.ecr.us-east-1.amazonaws.com/spark-scansearch:latest
+        ports:
+        - containerPort: 8000
+        livenessProbe:
+          httpGet:
+            path: "/scansearch"
+            port: 8000
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 10
+          periodSeconds: 30
+          successThreshold: 1
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: "/scansearch"
+            port: 8000
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 10
+          periodSeconds: 30
+          successThreshold: 1
+          failureThreshold: 3
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 500m
+            memory: 4Gi
+        env:
+        - name: project_env
+          value: prod
+        - name: project_name
+          value: spark-scansearch
+        - name: env_name
+          value: prod
+        envFrom:
+          - secretRef:
+              name: spark-scansearch-secrets

@@ -1,0 +1,16 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: spark-fileprocess
+  labels:
+    app: spark-fileprocess
+    Platform: spark
+  namespace: spark
+spec:
+  ports:
+  - port: 80
+    targetPort: 8000
+  selector:
+    app: spark-fileprocess
+  type: NodePort

@@ -1,0 +1,16 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: spark-securityscan
+  labels:
+    app: spark-securityscan
+    Platform: spark
+  namespace: spark
+spec:
+  ports:
+  - port: 80
+    targetPort: 8000
+  selector:
+    app: spark-securityscan
+  type: NodePort

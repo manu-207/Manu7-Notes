@@ -1,0 +1,37 @@
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:424258464218:certificate/ae0b8f9a-6a4f-42cb-b997-138c0aa1631d
+    alb.ingress.kubernetes.io/healthcheck-interval-seconds: "60"
+    alb.ingress.kubernetes.io/healthcheck-path: /
+    alb.ingress.kubernetes.io/healthcheck-port: traffic-port
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
+    alb.ingress.kubernetes.io/healthcheck-timeout-seconds: "5"
+    alb.ingress.kubernetes.io/healthy-threshold-count: "2"
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/success-codes: 200-499
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/unhealthy-threshold-count: "2"
+    kubernetes.io/ingress.class: alb
+  name: spark-ui-react
+  namespace: spark
+
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: spark-ui-react
+            port:
+              number: 443
+        path: /
+        pathType: Prefix
+

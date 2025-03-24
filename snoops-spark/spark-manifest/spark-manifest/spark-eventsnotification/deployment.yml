@@ -1,0 +1,62 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-eventsnotification
+  labels:
+    app: spark-eventsnotification
+    Platform: spark
+  namespace: spark
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spark-eventsnotification
+  template:
+    metadata:
+      labels:
+        app: spark-eventsnotification
+    spec:
+      serviceAccountName: spark
+      containers:
+      - name: spark-eventsnotification
+        image: 424258464218.dkr.ecr.us-east-1.amazonaws.com/spark-eventsnotification:latest
+        ports:
+        - containerPort: 8000
+        livenessProbe:
+          httpGet:
+            path: "/eventsnotification"
+            port: 8000
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 10
+          periodSeconds: 30
+          successThreshold: 1
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: "/eventsnotification"
+            port: 8000
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 10
+          periodSeconds: 30
+          successThreshold: 1
+          failureThreshold: 3
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 500m
+            memory: 4Gi
+        env:
+        - name: project_env
+          value: prod
+        - name: project_name
+          value: spark-eventsnotification
+        - name: env_name
+          value: prod
+        envFrom:
+          - secretRef:
+              name: spark-eventnotification-secrets

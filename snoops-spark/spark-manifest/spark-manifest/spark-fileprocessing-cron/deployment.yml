@@ -1,0 +1,22 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: spark-fileprocessing-cron
+  labels:
+    app: spark-fileprocessing-cron
+    Platform: spark
+  namespace: spark
+spec:
+  schedule: "* * * * *"
+  successfulJobsHistoryLimit: 2
+  concurrencyPolicy: Allow
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: spark-fileprocessing-cron
+            image: 424258464218.dkr.ecr.us-east-1.amazonaws.com/spark-fileprocessing-cron:latest
+            imagePullPolicy: Always
+          restartPolicy: Never

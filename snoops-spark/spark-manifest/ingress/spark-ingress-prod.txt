@@ -1,0 +1,91 @@
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    alb.ingress.kubernetes.io/healthcheck-interval-seconds: "60"
+    alb.ingress.kubernetes.io/healthcheck-path: /
+    alb.ingress.kubernetes.io/healthcheck-port: traffic-port
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
+    alb.ingress.kubernetes.io/healthcheck-timeout-seconds: "5"
+    alb.ingress.kubernetes.io/healthy-threshold-count: "2"
+    alb.ingress.kubernetes.io/scheme: internal
+    alb.ingress.kubernetes.io/success-codes: 200-499
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/unhealthy-threshold-count: "2"
+    kubernetes.io/ingress.class: alb
+  creationTimestamp: "2023-11-29T17:26:33Z"
+  finalizers:
+  - ingress.k8s.aws/resources
+  generation: 2
+  name: spark-backend-private
+  namespace: prod
+  resourceVersion: "52342083"
+  uid: 3443eb0d-2420-4d93-a4ac-178b7b384717
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: spark-authentication
+            port:
+              number: 80
+        path: /authentication
+        pathType: Prefix
+      - backend:
+          service:
+            name: spark-masterconfig
+            port:
+              number: 80
+        path: /masterconfig
+        pathType: Prefix
+      - backend:
+          service:
+            name: spark-securityscan
+            port:
+              number: 80
+        path: /securityscan
+        pathType: Prefix
+      - backend:
+          service:
+            name: spark-scansearch
+            port:
+              number: 80
+        path: /scansearch
+        pathType: Prefix
+      - backend:
+          service:
+            name: spark-authentication
+            port:
+              number: 80
+        path: /secure-auth
+        pathType: Prefix
+      - backend:
+          service:
+            name: spark-securityscan
+            port:
+              number: 80
+        path: /secure-scan
+        pathType: Prefix
+      - backend:
+          service:
+            name: spark-authentication
+            port:
+              number: 80
+        path: /sso
+        pathType: Prefix
+      - backend:
+          service:
+            name: spark-eventsnotification
+            port:
+              number: 80
+        path: /events-notifications
+        pathType: Prefix
+status:
+  loadBalancer:
+    ingress:
+    - hostname: internal-k8s-prod-sparkbac-e6b3fa620b-800062673.us-east-1.elb.amazonaws.com

@@ -1,0 +1,16 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: spark-ui
+  labels:
+    app: spark-ui
+    Platform: spark
+  namespace: spark
+spec:
+  ports:
+  - port: 443
+    targetPort: 80
+  selector:
+    app: spark-ui
+  type: NodePort

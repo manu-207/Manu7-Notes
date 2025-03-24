@@ -1,0 +1,62 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-scheduler
+  labels:
+    app: spark-scheduler
+    Platform: spark
+  namespace: spark
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spark-scheduler
+  template:
+    metadata:
+      labels:
+        app: spark-scheduler
+    spec:
+      serviceAccountName: spark
+      containers:
+      - name: spark-scheduler
+        image: 424258464218.dkr.ecr.us-east-1.amazonaws.com/spark-scheduler:latest
+        ports:
+        - containerPort: 8000
+        livenessProbe:
+          httpGet:
+            path: "/scheduler"
+            port: 8000
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 10
+          periodSeconds: 30
+          successThreshold: 1
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: "/scheduler"
+            port: 8000
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 10
+          periodSeconds: 30
+          successThreshold: 1
+          failureThreshold: 3
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 500m
+            memory: 4Gi
+        env:
+        - name: project_env
+          value: prod
+        - name: project_name
+          value: spark-scheduler
+        - name: env_name
+          value: prod
+        envFrom:
+          - secretRef:
+              name: spark-scheduler-secrets

@@ -1,0 +1,16 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: spark-scansearch
+  labels:
+    app: spark-scansearch
+    Platform: spark
+  namespace: spark
+spec:
+  ports:
+  - port: 80
+    targetPort: 8000
+  selector:
+    app: spark-scansearch
+  type: NodePort

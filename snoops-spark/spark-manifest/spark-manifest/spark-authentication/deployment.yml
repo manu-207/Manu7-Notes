@@ -1,0 +1,61 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-authentication
+  labels:
+    app: spark-authentication
+    Platform: spark
+  namespace: spark
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: spark-authentication
+  template:
+    metadata:
+      labels:
+        app: spark-authentication
+    spec:
+      serviceAccountName: spark
+      containers:
+      - name: spark-authentication
+        image: manu207/spark-authentication:latest
+        ports:
+        - containerPort: 8000
+        livenessProbe:
+          httpGet:
+            path: "/authentication"
+            port: 8000
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 10
+          periodSeconds: 30
+          successThreshold: 1
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: "/authentication"
+            port: 8000
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 10
+          periodSeconds: 30
+          successThreshold: 1
+          failureThreshold: 3
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 500m
+            memory: 4Gi
+        env:
+        - name: project_env
+          value: prod
+        - name: project_name
+          value: spark-authentication
+        - name: env_name
+          value: prod
+
+
