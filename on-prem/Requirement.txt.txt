@@ -1,0 +1,328 @@
+As per our discussion, here is the list of tasks involved in the on-premise installation. We can start with the DevOps-based tasks initially, and once the developers are free, we will continue with the developer tasks.
+
+# DevOps Ownership
+1. A Linux machine is required with 32GB RAM and an octa-core processor.  
+2. Install Kubernetes on the above machine. -------------------------------------> 
+3. Set up a Kubernetes architecture similar to what we have in the cloud.
+4. Install PostgreSQL, OpenSearch, Redis, and Kafka on the above machine.
+5. Set up local DNS and hosting links to each device.
+6. Configure the necessary secrets.
+7. Install Kong and set it up to replace the AWS API Gateway.
+8. Set up a pipeline with PyArmor code.
+--------------------------------------------------------------------------------------------------------------
+# Developer Ownership
+1. In the code, we need to turn off S3 functionality based on a constant: false for the cloud environment, true for on-premises.
+2. Configure the environment variables.
+3. Identify cloud-based services.
+4. In the frontend, identify any cloud-based fonts or JS libraries being used, and copy those fonts and JS files locally.
+
+----------
+k8s cluster (  ) 
+GitHub
+pipelines
+----------------------------------------------------------
+ip:  185.151.6.55
+port:  5507
+user name: eficensdev2
+pswd: Admin@Eficens2024*
+
+
+-----------------------------------------------------------
+# install minikube
+https://phoenixnap.com/kb/install-minikube-on-ubuntu
+
+sudo apt-get update -y
+sudo apt-get upgrade -y
+sudo apt-get install curl
+sudo apt-get install apt-transport-https
+----
+# docker 
+sudo apt install -y docker.io
+sudo systemctl enable docker
+sudo systemctl start docker
+sudo usermod -aG docker $USER
+docker version
+newgrp docker
+-------
+# minikube
+wget https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo cp minikube-linux-amd64 /usr/local/bin/minikube
+sudo chmod 755 /usr/local/bin/minikube
+minikube version
+---------------
+# kubectl 
+curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+sudo mv ./kubectl /usr/local/bin/kubectl
+kubectl version -o json
+----------------
+minikube start --memory=4096 --cpus=2
+          (or)
+minikube start --driver=docker
+minikube status
+kubectl get ns 
+kubectl get nodes
+kubectl describe nodes
+kubectl cluster-info
+minikube status
+minikube stop
+minikube delete
+--------------
+# multi node approach 
+minikube start --nodes 3 -p multinode --driver=docker
+minikube status -p multinode 
+minikube profile multinode 
+minikube status 
+-------------------------------
+# minikube logs 
+minikube logs --file=logs.txt
+---------------------------------
+# Assign Roles to Worker Nodes:
+kubectl label nodes multinode-m02 node-role.kubernetes.io/worker=worker
+kubectl label nodes multinode-m03 node-role.kubernetes.io/worker=worker
+-----------------------------
+# taint 
+kubectl taint nodes multinode  node-role.kubernetes.io/control-plane=:NoSchedule
+-------------------
+# minicube addons 
+minikube addons list
+minikube addons enable ingress
+-----------------
+kubectl get nodes --show-labels
+kubectl rollout restart deployment/coredns -n kube-system
+--------------------------------------------------
+
+# ingress installation 
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
+sudo nano /etc/hosts
+192.168.49.2 nginx.local
+
+minikube service nginx-service  --url
+---------------------------------------------------
+#metrics-server
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+kubectl create serviceaccount spark -n spark
+----------------------------
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+-----------------------------
+#service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: NodePort
+----------------------------------
+# ingress.yaml 
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: nginx.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-service
+            port:
+              number: 80
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+# Install PostgreSQL
+https://www.cherryservers.com/blog/how-to-install-and-setup-postgresql-server-on-ubuntu-20-04
+
+username postgres
+pwd Spark@2024
+
+vim /etc/postgresql/16/main/postgresql.conf
+
+vim /etc/postgresql/16/main/pg_hba.conf
+
+---------
+error  eficensdev2@eficensdev2:~$ sudo systemctl restart postgresql
+       Failed to allocate directory watch: Too many open files
+
+ulimit -n
+ulimit -n 65536
+
+
+sudo nano /etc/security/limits.conf
+*         soft    nofile      65536
+*         hard    nofile      65536
+
+sudo nano /etc/pam.d/common-session
+session required pam_limits.so
+
+sudo nano /etc/systemd/system.conf
+DefaultLimitNOFILE=65536
+
+sudo nano /etc/systemd/user.conf
+DefaultLimitNOFILE=65536
+sudo systemctl restart postgresql
+
+psql -h 192.168.1.100 -U postgresql -d demo
+
+10.123.105.7 192.168.49.1 192.168.58.1 172.17.0.1
+
+----------------------------------
+# spark-ui deployment
+
+if [ -d "node_modules" ]; then
+   rm -rf node_modules
+fi
+
+sudo apt-get remove nodejs
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+source ~/.bashrc
+
+nvm install 18
+nvm use 18
+
+node -v
+npm -v
+
+npm install -g npm@latest
+npm install -g @angular/cli
+
+npm run build:prod
+
+
+docker build -t spark/spark-ui:latest .
+docker run -d --name spark-ui spark/spark-ui:latest
+docker images 
+docker ps 
+docker ps -a
+docker rm -f containerid
+docker rmi imagename 
+docker pull spark/spark-ui:latest
+
+
+https://25599742650f499689dd2475bc99cf75.us-east-1.aws.found.io:9243/app/management/security/users
+elasticsearch
+elasticsearch@1234
+
+
+
+-------------------------------------------------
+
+
+multinode       Ready    control-plane   21h   v1.30.0   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=multinode,kubernetes.io/os=linux,minikube.k8s.io/commit=5883c09216182566a63dff4c326a6fc9ed2982ff,minikube.k8s.io/name=multinode,minikube.k8s.io/primary=true,minikube.k8s.io/updated_at=2024_06_18T09_06_00_0700,minikube.k8s.io/version=v1.33.1,node-role.kubernetes.io/control-plane=,node.kubernetes.io/exclude-from-external-load-balancers=
+
+multinode-m02   Ready    worker          21h   v1.30.0   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=multinode-m02,kubernetes.io/os=linux,minikube.k8s.io/commit=5883c09216182566a63dff4c326a6fc9ed2982ff,minikube.k8s.io/name=multinode,minikube.k8s.io/primary=false,minikube.k8s.io/updated_at=2024_06_18T09_06_50_0700,minikube.k8s.io/version=v1.33.1,node-role.kubernetes.io/worker=worker
+
+multinode-m03   Ready    worker          21h   v1.30.0   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=multinode-m03,kubernetes.io/os=linux,minikube.k8s.io/commit=5883c09216182566a63dff4c326a6fc9ed2982ff,minikube.k8s.io/name=multinode,minikube.k8s.io/primary=false,minikube.k8s.io/updated_at=2024_06_18T09_07_43_0700,minikube.k8s.io/version=v1.33.1,node-role.kubernetes.io/worker=worker
+
+
+
+
+
+
+
+-------------------------------------------------------------------------------------------------------------
+
+MetalLB: A software-based load balancer that works well for on-premises clusters.
+While Minikube on an on-premises Ubuntu server doesn't natively support LoadBalancer services like cloud providers, you can achieve similar functionality using Minikube tunnel or MetalLB. MetalLB provides a more production-like setup, making it a good choice for environments where you need persistent and reliable load balancing.
+
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.11.0/manifests/namespace.yaml
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.11.0/manifests/metallb.yaml
+-----------------------
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      tolerations:
+      - key: "node-role.kubernetes.io/control-plane"
+        operator: "Exists"
+        effect: "NoSchedule"
+      nodeSelector:
+        node-role.kubernetes.io/worker: worker
+      containers:
+      - name: nginx
+        image: nginx:1.21
+        ports:
+        - containerPort: 80
+---------------------------------------
+#service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: NodePort
+-----------------------------------
+# configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-system
+  name: config
+data:
+  config: |
+    address-pools:
+      - name: default
+        protocol: layer2
+        addresses:
+          - 10.123.105.7/24
+-----------------------------------
+
+minikube service nginx-service --url 10.123.105.0 ( load balancer external ip )
+
+
+
+psql -h 10.123.105.7 -U postgres -d demo
+psql -h 192.168.49.1 -U postgres -d demo
+psql -h 192.168.58.1 -U myuser -d mydb
+psql -h 172.17.0.1 -U myuser -d mydb
+
+
+
+Spark@2024

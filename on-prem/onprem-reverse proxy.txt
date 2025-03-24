@@ -1,0 +1,40 @@
+server {
+    listen 80;
+    listen [::]:80;
+    server_name spark-dev.eficensittest.com;
+
+    # Redirect all HTTP traffic to HTTPS
+    return 301 https://$host$request_uri;
+}
+
+# HTTPS Server Block: Handle secure traffic
+server {
+    server_name spark-dev.eficensittest.com;
+
+    # Handle Let's Encrypt ACME challenge requests
+    location /.well-known/acme-challenge/ {
+        proxy_pass http://10.123.16.11/.well-known/acme-challenge/;  # Proxy to the internal server
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        allow all;
+    }
+
+    # Main application proxy
+    location / {
+        proxy_pass http://10.123.16.11:30591;  # Internal server IP and frontend port
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # SSL Configuration
+    listen [::]:443 ssl; # managed by Certbot
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/spark-dev.eficensittest.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/spark-dev.eficensittest.com/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}

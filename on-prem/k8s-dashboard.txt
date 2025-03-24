@@ -1,0 +1,50 @@
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+kubectl get pods -n kubernetes-dashboard
+kubectl create serviceaccount dashboard-admin-sa -n kubernetes-dashboard
+kubectl create clusterrolebinding dashboard-admin-sa --clusterrole=cluster-admin --serviceaccount=kubernetes-dashboard:dashboard-admin-sa
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dashboard-admin-sa-token
+  namespace: kubernetes-dashboard
+  annotations:
+    kubernetes.io/service-account.name: dashboard-admin-sa
+type: kubernetes.io/service-account-token
+EOF
+
+kubectl get secret dashboard-admin-sa-token -n kubernetes-dashboard -o jsonpath="{.data.token}" | base64 --decode
+
+
+aws eks get-token --cluster-name kubernetes-admin@kubernetes | jq -r '.status.token'
+
+
+eyJhbGciOiJSUzI1NiIsImtpZCI6IlVqbU5rSHoxN1cwMENtWGNGdmxDVGlwVzVOX2x1ajhQQmRsbFpEdWUwVzQifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlcm5ldGVzLWRhc2hib2FyZCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJkYXNoYm9hcmQtYWRtaW4tc2EtdG9rZW4iLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGFzaGJvYXJkLWFkbWluLXNhIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiN2E0ODEzZDktN2NhZS00MzM5LTk0MTktNTQyODg3MGMyZWExIiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmVybmV0ZXMtZGFzaGJvYXJkOmRhc2hib2FyZC1hZG1pbi1zYSJ9.cj7LWcAZTvGnIlclFo4aFOCrijjowb69SLyZQfz2WviF8bJYi41SqfMm8nlAOONtJNS3Lmduq5R8dIHWZ5Po3Ffsm_-19PacE1Lfohms1lWtoKgsHE7CyjoZNyMWVSq1d3FWuXJZvch8YzdnbxlYDHbRjYZVRIPVGJxUS0K3FU7GcsNygpgPHgWLZNxAKowWlMsko2boZ6p5SmhPcoFD7Gx__iaE31AgYBrLM27nLcRhVqpV6qvOhHIITsQZeO044cRAVMBMZ_qvQkjVD4CkWUPGZPCkirDzjD_zgiRTzpZF_nc08pqw4SuHnP3UtHop85MNoOSHzjCOlRGS5F0Aub
+
+
+
+eyJhbGciOiJSUzI1NiIsImtpZCI6IkRYV2JBcncxcVBOaHJ1M2dhcENsZ3dJRkZLU2R5R05PbDBMdjNLUkxqNTQifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlcm5ldGVzLWRhc2hib2FyZCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJkYXNoYm9hcmQtYWRtaW4tc2EtdG9rZW4iLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGFzaGJvYXJkLWFkbWluLXNhIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiNWI1YzU1MTMtYzhjNy00OGYwLThlOGMtMTQ0NmY4YTZmOWI5Iiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmVybmV0ZXMtZGFzaGJvYXJkOmRhc2hib2FyZC1hZG1pbi1zYSJ9.9xNS0057RD7hJZF4uasIDNqgYNuRtUOhkX6Mtazok9rXSukv-FSoPMYT4uw0GNygd4frekhbBXJWDAkuZ5855FUxV0pnaOUG1nBGFm2PDD4i5f0XVeq4IT6a0YqSAMd7CEI6dJL_LPUR0UIvx7w33F7LjnN89oNQrxg2XxdGuYSBjTZKVewjsQTFtQk6BAxoka8JzIgnD7YMnXX4avhrToUOuwl8dQSzEM1hRTH84NrirgfyMB4Ir7ga5U6S8EwNA8hSfXqLmNQAWxitaWh7Y-QY6EwZINgb5bceVHUV6BuirDDLKpXULcJWVTdGbuzdnCWV1R3Sl8Mnzhd1xORNhA
+
+
+kubect edit svc kubernetes-dashboard -n kubernetes-dashboard
+
+
+
+# nginx reverse proxy
+
+server {
+    listen 80;
+    server_name spark.prodk8s.eficensittest.com;
+
+    location / {
+        proxy_pass https://10.123.16.15:31233;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+    }
+}
+
+

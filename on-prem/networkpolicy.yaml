@@ -1,0 +1,50 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-source-to-target
+  namespace: default  # Specify the namespace of the pods
+spec:
+  podSelector:
+    matchLabels:
+      app: spark-superadmin-ui  # Apply the policy to pods with the label app=target
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: spark-ui  # Allow traffic only from pods with the label app=source
+    ports:
+    - protocol: TCP
+      port: 80  # Specify the port (if required)
+  policyTypes:
+  - Ingress
+
+
+
+  ----------------------------------
+
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: restrict-external-access
+  namespace: spark
+spec:
+  podSelector:
+    matchLabels:
+      app: spark-ui
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    # Allow traffic from your firewall IP
+    - ipBlock:
+        cidr: 14.194.144.198/32
+    # Allow traffic from your VPC CIDR block
+    - ipBlock:
+        cidr: 172.31.0.0/16
+    # Optionally allow traffic within the same namespace
+    - namespaceSelector: {}
+    # Optionally allow traffic from specific pods in the namespace
+    - podSelector: {}
+
+

@@ -1,0 +1,50 @@
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+kubectl get pods -n kubernetes-dashboard
+kubectl create serviceaccount dashboard-admin-sa -n kubernetes-dashboard
+kubectl create clusterrolebinding dashboard-admin-sa --clusterrole=cluster-admin --serviceaccount=kubernetes-dashboard:dashboard-admin-sa
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dashboard-admin-sa-token
+  namespace: kubernetes-dashboard
+  annotations:
+    kubernetes.io/service-account.name: dashboard-admin-sa
+type: kubernetes.io/service-account-token
+EOF
+
+kubectl get secret dashboard-admin-sa-token -n kubernetes-dashboard -o jsonpath="{.data.token}" | base64 --decode
+
+
+aws eks get-token --cluster-name kubernetes-admin@kubernetes | jq -r '.status.token'
+
+
+
+--------------------------------------------------------------------------------------------------
+https://spark.prod.eficensittest.com/k8s/
+
+password: 
+
+
+kubect edit svc kubernetes-dashboard -n kubernetes-dashboard
+
+
+
+# nginx reverse proxy
+
+server {
+    listen 80;
+    server_name spark.prodk8s.eficensittest.com;
+
+    location / {
+        proxy_pass https://10.123.16.15:31233;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+    }
+}
+
+

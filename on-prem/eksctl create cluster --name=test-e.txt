@@ -1,0 +1,28 @@
+eksctl create cluster --name=test-eks \
+                      --region=us-east-2 \
+                      --zones=us-east-2a,us-east-2b \
+                      --without-nodegroup 
+
+eksctl utils associate-iam-oidc-provider \
+    --region us-east-2 \
+    --cluster test-eks \
+    --approve
+
+
+eksctl create nodegroup --cluster=test-eks \
+                        --region=us-east-2 \
+                        --name=test-eks-private57 \
+                        --node-type=t3.medium \
+                        --nodes=1 \
+                        --nodes-min=1 \
+                        --nodes-max=4 \
+                        --node-volume-size=20 \
+                        --ssh-access \
+                        --ssh-public-key=eks \
+                        --managed \
+                        --asg-access \
+                        --external-dns-access \
+                        --full-ecr-access \
+                        --appmesh-access \
+                        --alb-ingress-access 
+                    

@@ -1,0 +1,50 @@
+# airflow 
+
+sudo apt update
+sudo apt upgrade -y
+
+sudo add-apt-repository universe
+sudo apt update
+
+sudo apt install -y python3.10 python3.10-venv python3.10-dev
+
+
+python3.10 -m venv airflow_env
+source airflow_env/bin/activate
+
+
+AIRFLOW_VERSION=2.6.3
+PYTHON_VERSION="$(python --version | cut -d ' ' -f 2 | cut -d '.' -f 1-2)"
+CONSTRAINT_URL="https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt"
+pip install "apache-airflow==${AIRFLOW_VERSION}" --constraint "${CONSTRAINT_URL}"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sudo apt install -y python3 python3-pip python3-venv python3-dev libpq-dev
+
+sudo apt install -y python3.12 python3.12-venv python3.12-dev libpq-dev
+
+python3.10 -m venv airflow_env
+source airflow_env/bin/activate
+
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+python get-pip.py
+
+
+pip install "apache-airflow==2.6.3"
+
+
+
+

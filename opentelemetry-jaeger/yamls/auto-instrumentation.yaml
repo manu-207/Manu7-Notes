@@ -20,3 +20,5 @@ spec:
         value: otlp_proto_http
       - name: OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED
         value: "true"
+      - name: OTEL_PYTHON_LOG_CORRELATION
+        value: "true"

@@ -1,0 +1,27 @@
+----------------------------------
+ip addr show
+------------------------------------
+nano ~/.ssh/config
+
+Host ec2-54-159-36-64.compute-1.amazonaws.com-245
+    HostName ec2-54-159-36-64.compute-1.amazonaws.com
+    User ubuntu
+    IdentityFile /home/ubuntu/spark1-vpn.pem
+    LocalForward 127.0.0.1:2245 10.4.1.245:22
+
+Host ec2-54-159-36-64.compute-1.amazonaws.com-51
+    HostName ec2-54-159-36-64.compute-1.amazonaws.com
+    User ubuntu
+    IdentityFile /home/ubuntu/spark1-vpn.pem
+    LocalForward 127.0.0.1:2251 10.4.1.51:22
+
+Host ec2-54-159-36-64.compute-1.amazonaws.com-31
+    HostName ec2-54-159-36-64.compute-1.amazonaws.com
+    User ubuntu
+    IdentityFile /home/ubuntu/spark1-vpn.pem
+    LocalForward 127.0.0.1:2231 10.4.6.31:22
+---------------------------------------------------
+
+sudo ssh -F ~/.ssh/config ec2-54-159-36-64.compute-1.amazonaws.com-245
+sudo ssh -F ~/.ssh/config ec2-54-159-36-64.compute-1.amazonaws.com-51
+sudo ssh -F ~/.ssh/config ec2-54-159-36-64.compute-1.amazonaws.com-31

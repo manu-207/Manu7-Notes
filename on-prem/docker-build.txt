@@ -1,0 +1,83 @@
+npm run build:prod
+
+
+docker build -t manu207/spark-ui:latest-v100 .
+docker tag manu207/spark-ui:latest-v100 manu207/spark:ui-latest-v100
+docker push manu207/spark:ui-latest-v100
+ 
+ 
+docker build -t manu207/authentication:latest-v30 .
+docker tag manu207/authentication:latest-v30 manu207/spark:authentication-latest-v30
+docker push manu207/spark:authentication-latest-v30
+ 
+docker build -t manu207/securityscan:latest-v27 .
+docker tag manu207/securityscan:latest-v27 manu207/spark:securityscan-latest-v27
+docker push manu207/spark:securityscan-latest-v27
+ 
+ 
+docker build -t manu207/scansearch:latest-v27 .
+docker tag manu207/scansearch:latest-v27 manu207/spark:scansearch-latest-v27
+docker push manu207/spark:scansearch-latest-v27
+ 
+docker build -t manu207/fileprocess:latest-v27 .
+docker tag manu207/fileprocess:latest-v27 manu207/spark:fileprocess-latest-v27
+docker push manu207/spark:fileprocess-latest-v27
+ 
+docker build -t manu207/scheduler:latest-v27 .
+docker tag manu207/scheduler:latest-v27 manu207/spark:scheduler-latest-v27
+docker push manu207/spark:scheduler-latest-v27
+ 
+docker build -t manu207/masterconfig:latest-v27 .
+docker tag manu207/masterconfig:latest-v27 manu207/spark:masterconfig-latest-v27
+docker push manu207/spark:masterconfig-latest-v27
+ 
+docker build -t manu207/event-notification:latest-v27 .
+docker tag manu207/event-notification:latest-v27 manu207/spark:event-notification-latest-v27
+docker push manu207/spark:event-notification-latest-v27
+ 
+docker build -t manu207/websocket:latest-v27 .
+docker tag manu207/websocket:latest-v27 manu207/spark:websocket-latest-v27
+docker push manu207/spark:websocket-latest-v27
+
+----------------------------------------
+
+docker build -t eficens2024/authentication:latest-v100 .
+docker tag eficens2024/authentication:latest-v100 eficens2024/spark:authentication-latest-v100
+docker push eficens2024/spark:authentication-latest-v100
+
+docker build -t eficens2024/securityscan:latest-v100 .
+docker tag eficens2024/securityscan:latest-v100 eficens2024/spark:securityscan-latest-v100
+docker push eficens2024/spark:securityscan-latest-v100
+
+docker build -t eficens2024/masterconfig:latest-v100 .
+docker tag eficens2024/masterconfig:latest-v100 eficens2024/spark:masterconfig-latest-v100
+docker push eficens2024/spark:masterconfig-latest-v100
+
+docker build -t eficens2024/scansearch:latest-v100 .
+docker tag eficens2024/scansearch:latest-v100 eficens2024/spark:scansearch-latest-v100
+docker push eficens2024/spark:scansearch-latest-v100
+
+docker build -t eficens2024/scheduler:latest-v100 .
+docker tag eficens2024/scheduler:latest-v100 eficens2024/spark:scheduler-latest-v100
+docker push eficens2024/spark:scheduler-latest-v100
+
+docker build -t eficens2024/fileprocess:latest-v100 .
+docker tag eficens2024/fileprocess:latest-v100 eficens2024/spark:fileprocess-latest-v100
+docker push eficens2024/spark:fileprocess-latest-v100
+
+docker build -t eficens2024/event-notification:latest-v100 .
+docker tag eficens2024/event-notification:latest-v100 eficens2024/spark:event-notification-latest-v100
+docker push eficens2024/spark:event-notification-latest-v100
+
+docker build -t eficens2024/spark-ui:latest-v100 .
+docker tag eficens2024/spark-ui:latest-v100 eficens2024/spark:ui-latest-v100
+docker push eficens2024/spark:ui-latest-v100
+
+docker build -t eficens2024/websocket:latest-v100 .
+docker tag eficens2024/websocket:latest-v100 eficens2024/spark:websocket-latest-v100
+docker push eficens2024/spark:websocket-latest-v100
+
+
+docker build -t  eficens2024/spark-ui:latest-v101 .
+docker tag  eficens2024/spark-ui:latest-v101  eficens2024/spark:ui-latest-v101
+docker push  eficens2024/spark:ui-latest-v101

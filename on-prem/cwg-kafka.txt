@@ -1,0 +1,41 @@
+
+sudo apt-get update
+wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
+sudo dpkg -i amazon-cloudwatch-agent.deb
+sudo find / -name amazon-cloudwatch-agent
+export PATH=$PATH:/opt/aws/amazon-cloudwatch-agent/bin
+echo 'export PATH=$PATH:/opt/aws/amazon-cloudwatch-agent/bin' >> ~/.bashrc
+source ~/.bashrc
+amazon-cloudwatch-agent --version
+
+
+
+sudo nano /opt/aws/amazon-cloudwatch-agent/bin/config.json
+
+{
+    "logs": {
+        "logs_collected": {
+            "files": {
+                "collect_list": [
+                    {
+                        "file_path": "/root/kafka/logs/*",
+                        "log_group_name": "KafkaLogs-stage",
+                        "log_stream_name": "{instance_id}/kafka",
+                        "timezone": "UTC"
+                    }
+                ]
+            }
+        }
+    }
+}
+
+
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
+    -a fetch-config \
+    -m ec2 \
+    -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json \
+    -s
+
+
+sudo tail -f /var/log/amazon/amazon-cloudwatch-agent/amazon-cloudwatch-agent.log
+

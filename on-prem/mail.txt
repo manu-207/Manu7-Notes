@@ -1,0 +1,44 @@
+
+
+
+free IPs Tunnels: 172.31.5.90/32, 172.31.5.91/32, 172.31.5.92/32, 172.31.5.93/32, 172.31.5.94/32, 172.31.5.95/32, 
+Request for Creation of 9 Tunnels (IKEv2) from Palo Alto Firewall to Spark AWS Account for VPN Use Case Testing
+
+
+Dear IT Helpdesk,
+
+I hope this email finds you well. I am writing to request the creation of a secure VPN tunnel from our Palo Alto firewall to our Spark AWS account. This tunnel will facilitate secure and seamless communication between our on-premises infrastructure and the AWS cloud environment.
+ 
+Here are the AWS details necessary for the setup:
+AWS Account Information:
+Account ID: 424258464218
+Region: us-east-1
+VPC CIDR: 172.31.0.0/16
+Subnet Range: 172.31.5.0/24
+Public IP of Strong swan server: 34.194.242.51
+
+Below items need to update:
+
+IKE Gateway:
+Version – IKEv2 only mode
+
+IKE Crypto profile:
+DH-Group – Group2
+Authentication – sha256
+Encryption – aes-256-cbc
+Life Time – 8 Hours
+
+IPSec Crypto Profile:
+IPSEC Protocol - ESP
+Encryption – aec-256-cbc
+Authentication – sha256
+DH-Group – Group2
+Life Time – 1 Hour
+
+Please find attached document for creating Tunnels.
+
+I would appreciate it if you could prioritize this request and provide an estimated timeline for the setup. If you require any further information or details, please feel free to contact me.
+
+
+Thanks,
+Manmadha Rao B.

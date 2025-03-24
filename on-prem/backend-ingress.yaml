@@ -1,0 +1,81 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: spark-backend
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /authentication
+        pathType: Prefix
+        backend:
+          service:
+            name: spark-authentication
+            port:
+              number: 80
+      - path: /masterconfig
+        pathType: Prefix
+        backend:
+          service:
+            name: spark-masterconfig
+            port:
+              number: 80
+      - path: /securityscan
+        pathType: Prefix
+        backend:
+          service:
+            name: spark-securityscan
+            port:
+              number: 80
+      - path: /scansearch
+        pathType: Prefix
+        backend:
+          service:
+            name: spark-scansearch
+            port:
+              number: 80
+      - path: /secure-auth
+        pathType: Prefix
+        backend:
+          service:
+            name: spark-authentication
+            port:
+              number: 80
+      - path: /secure-scan
+        pathType: Prefix
+        backend:
+          service:
+            name: spark-securityscan
+            port:
+              number: 80
+      - path: /sso
+        pathType: Prefix
+        backend:
+          service:
+            name: spark-authentication
+            port:
+              number: 80
+      - path: /events-notifications
+        pathType: Prefix
+        backend:
+          service:
+            name: spark-eventsnotification
+            port:
+              number: 80
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: spark-websocket
+            port:
+              number: 80
+      - path: /scheduler
+        pathType: Prefix
+        backend:
+          service:
+            name: spark-scheduler
+            port:
+              number: 80

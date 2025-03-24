@@ -1,0 +1,329 @@
+spark-strongswan dev server ip: 52.4.111.253
+user: ubuntu
+key pair: spark-vpn.pem
+
+dev private ip: 172.31.4.60, 172.31.4.67, 172.31.4.68, 172.31.4.69, 172.31.4.70, 172.31.4.71
+
+-----------------------------------
+spark-strongswan stage server ip:34.194.242.51
+user: ubuntu
+pem-key: spark-vpn
+
+stage private ips----->  172.31.5.90, 172.31.5.91, 172.31.5.92, 172.31.5.93, 172.31.5.94, 172.31.5.95,172.31.5.54,172.31.5.55,172.31.5.56,172.31.5.57,172.31.5.58,172.31.5.59
+-----------------------------------
+
+strongswan server public IP : 3.234.164.216
+username: ubuntu
+pem key: spark-vpn
+
+prod  private ips----->10.0.1.67, 10.0.1.68, 10.0.1.69, 10.0.1.70, 10.0.1.71, 10.0.1.6710.0.1.72,10.0.1.168,  10.0.1.169, 10.0.1.170
+
+ new prod  private ips  ---------->  
+----------------------------------------------------
+# vpn setup
+https://vkontech.com/aws-site-to-site-vpn-with-strongswan/
+
+# strongswan installation
+sudo apt update
+sudo apt install strongswan
+-----------------------------------------------
+sudo nano /etc/sysctl.conf
+
+net.ipv4.ip_forward = 1
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.conf.all.send_redirects = 0
+
+-------------------------
+sudo nano /etc/ipsec.conf
+
+config setup
+        # strictcrlpolicy=yes
+        uniqueids = no
+
+conn Tunnel3
+        auto=start
+        left=%defaultroute
+        leftid=52.4.111.253
+        right=14.194.144.198
+        type=tunnel
+        leftauth=psk
+        rightauth=psk
+        keyexchange=ikev2
+        ike=aes256-sha256-modp1024
+        ikelifetime=8h
+        esp=aes256-sha256-modp1024
+        lifetime=1h
+        keyingtries=%forever
+        leftsubnet=172.31.4.67/32
+        rightsubnet=192.168.50.0/23
+        dpddelay=10s
+        dpdtimeout=30s
+-----------------------------------------------------------
+sudo nano /etc/ipsec.secrets
+
+# This file holds shared secrets or RSA private keys for authentication.
+# RSA private key for this host, authenticating it to any other host
+# which knows the public part.
+
+13.200.180.167 13.235.139.145 : PSK "2W6vDk7J9ktCFzcq9h_i9dIk8McugY6y"
+13.200.180.167 3.208.161.92 : PSK "eL4qsdm9Wg9Hevj3C7cPcFVYryXoYNT3"
+--------------------------------------
+sudo ipsec restart
+sudo ipsec statusall
+-------------------------------------------------------------
+sudo nano /etc/netplan/50-cloud-init.yaml
+
+network:
+    ethernets:
+        ens5:
+            addresses:
+            - 172.31.4.60/24
+            - 172.31.4.67/24
+            - 172.31.4.68/24
+            - 172.31.4.69/24
+            - 172.31.4.70/24
+            - 172.31.4.71/24
+            dhcp4: true
+            dhcp6: false
+            match:
+                macaddress: 0a:ff:ec:27:99:a9
+            set-name: ens5
+    version: 2
+
+sudo netplan apply
+ip addr show ens5
+
+-------------------------------------------------------------
+
+
+
+
+
+
+
+-----------------------------
+# adding multiple IPs
+
+ip a 
+
+sudo ip addr add 172.31.4.67/24 dev ens5
+sudo ip addr add 172.31.4.68/24 dev ens5
+sudo ip addr add 172.31.4.69/24 dev ens5
+sudo ip addr add 172.31.4.70/24 dev ens5
+
+
+-----------------------------
+
+sudo nano /etc/netplan/50-cloud-init.yaml
+
+# /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg with the following:
+# network: {config: disabled}
+network:
+    version: 2
+    ethernets:
+        ens5:
+            dhcp4: true
+            dhcp6: false
+            match:
+                macaddress: 02:9e:9d:58:57:25
+            set-name: ens5
+            addresses:
+                - 10.200.0.100/24
+                - 10.200.0.212/24
+------------------------------
+# adding private ip with below command
+aws ec2 assign-private-ip-addresses --network-interface-id eni-0ba6867a297852e74 --private-ip-addresses 10.200.0.100 --allow-reassignment
+
+sudo netplan apply
+ip addr show
+ip a
+or 
+
+
+
+
+------------------------------------------------
+
+ping -I sourceIP for Client1  client1 private ip
+ping -I     10.200.0.212         10.100.0.189
+
+ping -I sourceIP for Client2  client2 private ip
+ping -I   10.200.0.100           10.100.0.205
+
+
+
+
+
+EC2-A(client1)  10.100.0.189-----> Tunnel 1
+EC2-C (client 2) 10.100.0.205 ----> Tunnel 2
+----------------------------------------------
+# ssh commands 
+sudo ssh -i /home/ubuntu/vpn.pem ubuntu@10.100.0.189   -----------------> client1 ssh 
+
+sudo ssh -i /home/ubuntu/ec2-c.pem ubuntu@10.100.0.205 -b 10.200.0.100 -------> client2 ssh
+
+------------------------------------------------------
+
+ping -I sourceIP for Client1  client1 private ip
+ping -I 172.31.4.67 10.100.0.189
+
+ping -I sourceIP for Client2  client2 private ip
+ping -I 172.31.4.60  10.100.0.205
+
+ping -I sourceIP for Client2  client2 private ip
+ping -I 172.31.4.68  192.168.50.1
+
+sudo ssh -i /home/ubuntu/vpn2.pem ubuntu@10.100.0.205   -----------------> client1 ssh 
+
+sudo ssh -i /home/ubuntu/vpn.pem ubuntu@10.100.0.189 -b 172.31.4.67 -------> client2 ssh
+
+
+---------------------------------------------------------
+172.31.4.67/32
+
+
+# ssh form once ec2-B to another ec2-A
+
+sudo chmod 400 vpn.pem        (ec2-A)
+
+sudo ssh -i /home/ubuntu/vpn.pem ubuntu@10.100.0.189 (privateIP)  (ec2-A)  
+---------------------------------------------------
+# ssh form once ec2-B to another ec2-C
+
+sudo chmod 400 ec2-c.pem       (ec2-c)
+
+sudo ssh -i /home/ubuntu/ec2-c.pem ubuntu@10.100.0.205 (privateIP) (ec2-c)
+---------------------------------------------------------------------------
+# bind ip
+sudo ssh -i /home/ubuntu/ec2-c.pem ubuntu@10.100.0.205 -b 10.200.0.100
+
+# ssh connection
+sudo ssh -i /home/ubuntu/vpn.pem ubuntu@10.200.0.212
+sudo ssh -i /home/ubuntu/vpn.pem ubuntu@10.200.0.100
+-------------------------------------------------
+
+
+stage private ips----->  172.31.5.90, 172.31.5.91, 172.31.5.92, 172.31.5.93, 172.31.5.94, 172.31.5.95
+
+prod  private ips----->10.0.1.67, 10.0.1.68, 10.0.1.69, 10.0.1.70, 10.0.1.71, 10.0.1.6710.0.1.72
+
+sudo netplan apply
+ip addr show
+ip a
+or 
+
+sudo ip addr add 10.0.1.68/24 dev ens5
+
+sudo ip addr add 172.31.4.67/24 dev ens5
+
+
+sudo ip addr add 172.31.5.55/24 dev ens5
+
+
+
+
+
+
+
+
+
+nano ~/.ssh/known_hosts
+
+|1|U0XJ3jJvpOo3pxiS/iUOhRlwMmo=|JzNvXYx85ghTMNns0fbeXzfuvVk= ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKSW2WqQmXEJZyOwglK3NM3d+/o+ZIBg/FLzewQnEwr/
+|1|ToxPJuikjTCGR5xcTG7t17XklQc=|HGXFXYZrsxcOgfh/QZ3z/xCb9pI= ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKSW2WqQmXEJZyOwglK3NM3d+/o+ZIBg/FLzewQnEwr/
+
+
+echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward
+
+#sudo ip route add client 1 subnet id via strong swan server private ip 1
+
+sudo ip route add 10.100.0.0/24 via 10.200.0.212
+sudo ip route add 10.100.0.0/24 via 10.200.0.100
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-------------
+# roughf work 
+
+
+sudo nano ~/.ssh/config
+
+Host ec2-ip-100
+    HostName 10.200.0.100
+    User ubuntu
+    IdentityFile /home/ubuntu/vpn.pem
+
+Host ec2-ip-212
+    HostName 10.200.0.212
+    User ubuntu
+    IdentityFile /home/ubuntu/vpn.pem
+
+
+sudo apt-get update
+sudo apt-get install unzip -y
+ls
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+aws --version
+
+aws ec2 assign-private-ip-addresses --network-interface-id eni-0ba6867a297852e74 --private-ip-addresses 10.200.0.100 --allow-reassignment
+  
+ 33  sudo nano /etc/ipsec.conf
+   34  sudo ipsec restart
+   35  sudo ipsec statusall
+   36  ping -I 192.168.0.100 192.168.1.1
+   37  ping -I 10.200.0.212 10.100.0.189
+   38  ping -I 10.200.0.100 10.100.0.205
+   39  ping -I 10.200.0.100 10.100.0.189
+   40  ping -I 10.200.0.205 10.100.0.189
+   41  ping -I 10.200.0.212 10.100.0.189
+   42  ping -I 10.200.0.100 10.100.0.189
+   43  sudo nano /etc/netplan/50-cloud-init.yaml
+   44  sudo netplan apply
+   45  ip addr show eth0
+   46  ip addr show eth5
+   47  sudo nano /etc/netplan/50-cloud-init.yaml
+   48  sudo netplan apply
+   49  ip addr show eth0
+   50  ip addr show
+   51  ip a
+   52  sudo nano /etc/netplan/50-cloud-init.yaml
+   53  sudo netplan apply
+   54  ping -I 10.200.0.100 10.100.0.189
+   55  ping -I 10.200.0.100 10.100.0.205
+   56  ping -I 10.200.0.212 10.100.0.189
+
+424258464218
+52.4.111.253
+172.31.4.0/24
+172.31.0.0/16
+
+
+
+
+ping -I 172.31.4.60 10.2.10.119
+
+ping -I 172.31.4.67 192.168.50.0
+
+
+

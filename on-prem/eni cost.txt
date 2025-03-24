@@ -1,0 +1,48 @@
+
+# Number of ENI for each instance type
+
+In AWS, the number of Elastic Network Interfaces (ENIs) you can attach to an EC2 instance depends on the instance type. Each instance type has a different limit for the maximum number of ENIs. Here are some general guidelines for the most common instance types:
+t2.micro, t3.micro: 2 ENIs
+t2.medium, t3.medium: 3 ENIs
+m4.large, m5.large: 3 ENIs
+m4.xlarge, m5.xlarge: 4 ENIs
+c4.large, c5.large: 3 ENIs
+c4.xlarge, c5.xlarge: 4 ENIs
+r4.large, r5.large: 3 ENIs
+r4.xlarge, r5.xlarge: 4 ENIs
+-----------------------------------------
+# Number of IPs for each ENI
+
+The number of IP addresses required for each Elastic Network Interface (ENI) in AWS depends on the number of secondary private IP addresses you assign to it. Here's a general guideline:
+Primary IP Address: Each ENI must have exactly one primary private IP address.
+Secondary IP Addresses: You can optionally assign additional (secondary) private IP addresses to an ENI.
+The maximum number of private IP addresses (including the primary one) that can be assigned to an ENI depends on the instance type. Here is a summary of the maximum number of private IP addresses per ENI for some instance types:
+t2.micro, t3.micro: 2 IPs (1 primary + 1 secondary)
+t2.medium, t3.medium: 6 IPs (1 primary + 5 secondary)
+m4.large, m5.large: 10 IPs (1 primary + 9 secondary)
+m4.xlarge, m5.xlarge: 15 IPs (1 primary + 14 secondary)
+c4.large, c5.large: 10 IPs (1 primary + 9 secondary)
+c4.xlarge, c5.xlarge: 15 IPs (1 primary + 14 secondary)
+r4.large, r5.large: 10 IPs (1 primary + 9 secondary)
+r4.xlarge, r5.xlarge: 15 IPs (1 primary + 14 secondary)
+----------------------------------------------
+# monthly cost of each instance type
+ 
+t2.micro: $8.35
+t3.micro: $7.49
+t2.medium: $33.41
+t3.medium: $29.95
+m4.large: $72.00
+m5.large: $69.12
+m4.xlarge: $144.00
+m5.xlarge: $138.24
+c4.large: $72.00
+c5.large: $61.20
+c4.xlarge: $143.28
+c5.xlarge: $122.40
+r4.large: $95.76
+r5.large: $90.72
+r4.xlarge: $191.52
+r5.xlarge: $181.44
+
+ 

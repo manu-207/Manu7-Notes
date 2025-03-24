@@ -1,0 +1,20 @@
+# install redis 
+https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-20-04
+
+sudo nano /etc/redis/redis.conf
+
+bind 0.0.0.0
+cluster-enabled yes
+requirepass netsecpros2022! 
+
+sudo systemctl restart redis 
+
+# login to redis cluster
+redis-cli -h 10.0.23.207 -p 6379
+redis-cli -h 10.0.23.207 -p 6379 -a netsecpros2022!
+cluster info 
+cluster nodes 
+
+
+
+

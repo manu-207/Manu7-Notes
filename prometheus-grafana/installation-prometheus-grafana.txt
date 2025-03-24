@@ -39,12 +39,12 @@ grafana:
     annotations:
       service.beta.kubernetes.io/aws-load-balancer-type: "alb"
       service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
-      service.beta.kubernetes.io/aws-load-balancer-subnets: "subnet-0023ff4bd4ab4e6e6,subnet-025a00cbb2e8f88ac,subnet-0adc595abd8d30780,subnet-0fe8e450bc917d52c"
+      service.beta.kubernetes.io/aws-load-balancer-subnets: ""
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
       alb.ingress.kubernetes.io/scheme: "internet-facing"
       alb.ingress.kubernetes.io/target-type: "ip"
-  adminUser: "admin"          # Specify the admin username
-  adminPassword: "Spark@123"  # Specify a permanent password
+  adminUser: ""          # Specify the admin username
+  adminPassword: ""  # Specify a permanent password
 
   loki:
     config:
@@ -93,7 +93,7 @@ eksctl create iamserviceaccount \
   --role-only \
   --role-name AmazonEKS_EBS_CSI_DriverRole
 
-eksctl create addon --name aws-ebs-csi-driver --cluster cms-eks --service-account-role-arn arn:aws:iam::238393102293:role/AmazonEKS_EBS_CSI_DriverRole --force
+eksctl create addon --name aws-ebs-csi-driver --cluster cms-eks --service-account-role-arn arn:aws:iam::238393102293545:role/AmazonEKS_EBS_CSI_DriverRole --force
 
 # install prometheus
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
@@ -127,7 +127,7 @@ service:
   annotations:
     service.beta.kubernetes.io/aws-load-balancer-type: "alb"  # Use "alb" for Application Load Balancer
     service.beta.kubernetes.io/aws-load-balancer-internal: "false"
-    service.beta.kubernetes.io/aws-load-balancer-subnets: "subnet-0fe8e450bc917d52c,subnet-0023ff4bd4ab4e6e6,subnet-025a00cbb2e8f88ac,subnet-0adc595abd8d30780" 
+    service.beta.kubernetes.io/aws-load-balancer-subnets: "" 
     service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"  # Set to "internal" for internal ALB
 datasources:
   datasources.yaml:
@@ -149,7 +149,7 @@ helm install grafana grafana/grafana \
     --values ${HOME}/environment/grafana/grafana.yaml \
     --set service.type=LoadBalancer
 
-    helm install grafana grafana/grafana --namespace grafana --set persistence.storageClassName="gp2" --set persistence.enabled=true --set adminPassword=Spark@123 --values C:\Users\manmadhab.EFICENS/grafana/grafana.yaml --set service.type=LoadBalancer
+    helm install grafana grafana/grafana --namespace grafana --set persistence.storageClassName="gp2" --set persistence.enabled=true --set adminPassword=fdffjc@123 --values C:\Users\manmadhab.EFICENS/grafana/grafana.yaml --set service.type=LoadBalancer
 
 export ELB=$(kubectl get svc -n grafana grafana -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
 echo "http://$ELB"

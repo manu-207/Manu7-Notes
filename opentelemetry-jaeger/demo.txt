@@ -1,1 +1,67 @@
 # opentelemetry and jaeger 
+
+pip3 install opentelemetry-distro opentelemetry-exporter-otlp
+opentelemetry-bootstrap -a install
+
+pip3 install opentelemetry-api opentelemetry-sdk opentelemetry-instrumentation-flask
+
+
+pip3 install opentelemetry-instrumentation
+
+
+
+export FLASK_APP=app.py
+
+------
+#app.py
+
+from flask import Flask
+
+app = Flask(__name__)
+
+
+@app.route("/")
+def hello_world():
+    return "<p>Hello, World!</p>"
+
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0')
+
+
+--------------
+export OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED=true && \
+opentelemetry-instrument --traces_exporter console --metrics_exporter console --logs_exporter console --service_name flask-sample-server flask run -p 5000
+
+---------------------------
+
+which opentelemetry-instrument
+
+
+echo 'export PATH=$PATH:~/.local/bin' >> ~/.bashrc
+source ~/.bashrc
+
+# correct  approach including with self signed certificates 
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.16.3/cert-manager.yaml
+kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml
+
+# for opentelemetry operator 
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.yaml
+kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml
+
+
+---------------------------------------------------------
+
+pip3 install opentelemetry-distro opentelemetry-exporter-otlp
+opentelemetry-bootstrap -a install
+
+pip3 install opentelemetry-api opentelemetry-sdk opentelemetry-instrumentation-django
+pip3 install opentelemetry-instrumentation
+
+export OTEL_PYTHON_LOGGING_AUTO_INSTRUMENTATION_ENABLED=true
+export OTEL_SERVICE_NAME=spark-config-collector-service
+
+
+
+opentelemetry-instrument --traces_exporter console --metrics_exporter console --logs_exporter console --service_name spark-config-collector-service python3 manage.py runserver 0.0.0.0:8011
+

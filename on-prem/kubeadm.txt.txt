@@ -1,0 +1,1413 @@
+As per our discussion, here is the list of tasks involved in the on-premise installation. We can start with the DevOps-based tasks initially, and once the developers are free, we will continue with the developer tasks.
+
+# DevOps Ownership
+1. A Linux machine is required with 32GB RAM and an octa-core processor.  
+2. Install Kubernetes on the above machine. -------------------------------------> 
+3. Set up a Kubernetes architecture similar to what we have in the cloud.
+4. Install PostgreSQL, OpenSearch, Redis, and Kafka on the above machine.
+5. Set up local DNS and hosting links to each device.
+6. Configure the necessary secrets.
+7. Install Kong and set it up to replace the AWS API Gateway.
+8. Set up a pipeline with PyArmor code.
+--------------------------------------------------------------------------------------------------------------
+# Developer Ownership
+1. In the code, we need to turn off S3 functionality based on a constant: false for the cloud environment, true for on-premises.
+2. Configure the environment variables.
+3. Identify cloud-based services.
+4. In the frontend, identify any cloud-based fonts or JS libraries being used, and copy those fonts and JS files locally.
+--------------------------------------------------------------------------------------------
+Approach ------>  SAAS  (software as service)
+with k8s ( 6 packages ) 
+# infra requirement
+1. DB configuration  externally ( jsock ( artifactory ))
+2. PostgreSQL, OpenSearch, Redis, and Kafka 
+3. DNS hosting
+4. monithilic vs microservice 
+-------------------------------------------------------------------------------------------
+
+if [ -d "node_modules" ]; then
+   rm -rf node_modules
+fi
+
+npm install --force
+
+npm run build:prod
+
+----------------------------------------------------------
+ip:  185.151.6.55
+port:  5507
+user name: eficensdev2
+pswd: Admin@Eficens2024*
+
+uname -r
+hostnamectl
+-----------------------------------------------------------
+# Kubeadm
+https://hbayraktar.medium.com/how-to-install-kubernetes-cluster-on-ubuntu-22-04-step-by-step-guide-7dbf7e8f5f99
+https://www.linuxtechi.com/install-kubernetes-on-ubuntu-22-04/
+
+sudo apt install -y curl gnupg2 software-properties-common apt-transport-https ca-certificates
+sudo  curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+sudo  echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+----------------------------------------
+ mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Alternatively, if you are the root user, you can run:
+
+  export KUBECONFIG=/etc/kubernetes/admin.conf
+
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+Then you can join any number of worker nodes by running the following on each as root:
+
+kubeadm join 10.123.105.7:6443 --token 7f9c74.wb9ls5p7tgjfv9dj --discovery-token-ca-cert-hash sha256:5498adbcc3c3467c7e860ba9f18e12551c7b7a54d202789ef3db0bb0b3333956
+
+# adding worker nodes
+kuberadmin@kuberubuntu:~$ kubeadm token create --print-join-command
+kubeadm join 10.123.16.11:6443 --token 9vz5t8.1i10txdd0cs3x13n --discovery-token-ca-cert-hash sha256:21ab08a88f9820db60cd6f26e99dfa36260db5471d3073a4b88e31ffe739463c
+
+
+kubectl get nodes --show-labels
+kubectl label node eficensdev2 ingress-ready=true
+kubectl describe node eficensdev2 | grep Taints
+kubectl get pods -n ingress-nginx
+---------------------------------------------------------------------
+sudo apt update && sudo apt upgrade -y
+
+sudo swapoff -a
+sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+sudo tee /etc/modules-load.d/containerd.conf <<EOF
+overlay
+br_netfilter
+EOF
+sudo modprobe overlay
+sudo modprobe br_netfilter
+
+sudo tee /etc/sysctl.d/kubernetes.conf <<EOF
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_forward = 1
+EOF
+
+sudo sysctl --system
+
+sudo apt install -y curl gnupg2 software-properties-common apt-transport-https ca-certificates
+sudo  curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+sudo  echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+sudo apt update
+sudo apt install -y containerd.io
+
+sudo mkdir -p /etc/containerd
+containerd config default | sudo tee /etc/containerd/config.toml
+sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
+
+sudo systemctl restart containerd
+sudo systemctl status containerd
+
+# kubelet was not start
+sudo journalctl -u kubelet -xe
+sudo kubeadm init phase kubelet-start
+
+sudo kubeadm join 10.123.16.11:6443 --token lny2xr.nakuhcgv4nadw4iz --discovery-token-ca-cert-hash sha256:21ab08a88f9820db60cd6f26e99dfa36260db5471d3073a4b88e31ffe739463c
+
+
+
+
+
+---------------------------------------------
+# error
+E0701 14:42:42.616334   18890 memcache.go:265] couldn't get current server API group list: Get "https://10.123.105.7:6443/api?timeout=32s": dial tcp 10.123.105.7:6443: connect: connection refused
+sudo swapoff -a
+sudo nano /etc/fstab
+# /swap.img    none    swap    sw    0   0
+free -h
+sudo systemctl daemon-reload
+sudo systemctl restart kubelet
+sudo systemctl status kubelet
+ 
+
+------------------------------
+# docker 
+sudo apt install -y docker.io
+sudo systemctl enable docker
+sudo systemctl start docker
+sudo usermod -aG docker $USER
+docker version
+newgrp docker
+--------------------------------------------
+
+# ingress installation 
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
+kubectl taint nodes ip-10-0-23-207 node-role.kubernetes.io/control-plane:NoSchedule-
+
+sudo nano /etc/hosts
+ 10.123.105.7  nginx.local
+
+---------------------------------------------------
+#metrics-server
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+kubectl create serviceaccount spark -n spark
+----------------------------
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-deployment
+  labels:
+    app: myapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: spark-ui
+        image: manu207/spark:latest
+        ports:
+        - containerPort: 80
+      imagePullSecrets:
+      - name: docker-secrets
+-------------------
+# service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-service
+  labels:
+    app: myapp
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30007 # This can be any valid NodePort within the range 30000-32767
+  selector:
+    app: myapp
+---------------
+#ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: spark-ui
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: spark.eficensittest.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: spark-ui
+            port:
+              number: 80
+-------------------------------------  
+# spark-ui deployment
+
+if [ -d "node_modules" ]; then
+   rm -rf node_modules
+fi
+
+sudo apt-get remove nodejs
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+source ~/.bashrc
+
+nvm install 18
+nvm use 18
+
+node -v
+npm -v
+
+npm install -g npm@latest
+npm install -g @angular/cli
+
+npm run build:prod
+
+docker build -t manu207/spark-ui:latest-v1 .
+docker tag manu207/spark-ui:latest-v1 manu207/spark:ui-latest-v1
+docker push manu207/spark:ui-latest-v1
+
+docker build -t manu207/spark-ui:latest .
+docker tag manu207/spark-ui:latest manu207/spark-ui:latest
+docker push manu207/spark-ui:latest
+kubectl create serviceaccount spark -n spark
+
+
+docker run -d --name spark-ui manu207/spark-ui:latest
+docker images 
+docker ps 
+docker ps -a
+docker rm -f containerid
+docker rmi imagename 
+
+
+kubectl create secret docker-registry docker-secrets \
+--docker-server=https://index.docker.io/v1/ \
+--docker-username=manu207 \
+--docker-password=meghana207 \
+--docker-email=lovelymanu207@gmail.com \
+-n spark
+
+
+adding in docker secret in  deploymet file
+      imagePullSecrets:
+      - name: docker-secrets
+-------------------------------------------------------------------------------------------
+# spark-authentication deployment
+ 
+docker build -t manu207/spark-authentication:latest .
+docker tag manu207/spark-authentication:latest manu207/spark-authentication:latest
+docker push manu207/spark-authentication:latest
+docker run -p 8000:8000 manu207/spark-authentication:latest
+kubectl create serviceaccount spark -n spark
+
+
+
+---------------------------------------------------
+# nginx as reverse proxy server 
+
+sudo apt update
+sudo apt install nginx
+sudo nano /etc/nginx/sites-available/reverse-proxy.conf
+
+server {
+    listen 80;
+    server_name spark.eficensittest.com;
+
+    location / {
+        proxy_pass http://10.0.23.207:31528;  # Replace with your kubeadm cluster IP
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+
+server {
+    listen 80;
+    server_name kong.eficensittest.com;
+
+    location /api/ {
+        rewrite ^/api/(.*) /$1 break;
+        proxy_pass http://localhost:8001;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        # Add other proxy settings as needed
+    }
+
+    location / {
+        proxy_pass http://localhost:8001;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        # Add other proxy settings as needed
+    }
+}
+-------------------------------------------------------------------------------
+# Configuration for spark.eficensittest.com
+server {
+    listen 80;
+    server_name spark.eficensittest.com;
+
+    location / {
+        proxy_pass http://10.0.23.207:31528;  # Replace with your kubeadm cluster IP
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# Configuration for kong.eficensittest.com
+server {
+    listen 80;
+    server_name kong.eficensittest.com;
+
+    location /api/ {
+        rewrite ^/api/(.*) /$1 break;
+        proxy_pass http://localhost:8001;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location / {
+        proxy_pass http://localhost:8001;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+# Configuration for sparkbackend.eficensittest.com
+server {
+    listen 80;
+    server_name sparkbackend.eficensittest.com;
+
+    location / {
+        proxy_pass http://localhost:31824;  # NodePort for HTTP
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Optional: Handle HTTPS (requires SSL certificate)
+    # Uncomment and configure these lines if you plan to use HTTPS
+    # listen 443 ssl;
+    # ssl_certificate /path/to/your/fullchain.pem;
+    # ssl_certificate_key /path/to/your/privkey.pem;
+
+    # location / {
+    #     proxy_pass http://localhost:31824;  # NodePort for HTTP
+    #     proxy_set_header Host $host;
+    #     proxy_set_header X-Real-IP $remote_addr;
+    #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    #     proxy_set_header X-Forwarded-Proto $scheme;
+    # }
+}
+
+
+sudo rm /etc/nginx/sites-enabled/reverse-proxy.conf
+
+sudo ln -s /etc/nginx/sites-available/reverse-proxy.conf /etc/nginx/sites-enabled/
+
+sudo nginx -t
+sudo systemctl restart nginx
+sudo apt install python3-certbot-nginx
+sudo certbot --nginx
+sudo systemctl restart nginx
+sudo systemctl status certbot.timer
+ 
+sudo apt install certbot python3-certbot-nginx
+sudo certbot --nginx -d spark.eficensittest.com
+Check DNS Propagation:
+Use an online tool like whatsmydns.net to ensure the DNS record for spark.eficensittest.com points to 185.151.6.55
+
+80:31530/TCP,443:31077/TCP
+172.31.84.148
+curl -I http://172.31.84.148:30007
+
+# checking the dns 
+nslookup spark.eficensittest.com
+
+# which ports enabled on server 
+sudo netstat -tuln
+This command will show you all listening (-l) TCP (-t) and UDP (-u) ports along with their numeric (-n) addresses.
+
+# If ufw (Uncomplicated Firewall) is installed and in use, you can list the firewall rules:
+sudo ufw status
+# seaching with port number 
+sudo netstat -tuln | grep ':80'
+
+sudo ufw enable
+sudo ufw allow http
+sudo ufw allow https
+sudo ufw allow 30000:32767/tcp
+sudo ufw status
+
+
+------------------------------------------------------------------------------------
+
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+-----------------------------
+#service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: NodePort
+----------------------------------
+# ingress.yaml 
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: nginx.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-service
+            port:
+              number: 80
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+# install postgres in ec2 instance
+
+sudo apt-get update
+sudo apt-get install postgresql postgresql-contrib
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+sudo systemctl status postgresql
+sudo -i -u postgres
+sudo nano /etc/postgresql/14/main/postgresql.conf 
+sudo nano /etc/postgresql/14/main/postgresql.conf
+listen_addresses = '*'
+
+sudo nano /etc/postgresql/14/main/pg_hba.conf
+host    all             all             0.0.0.0/0               md5
+
+sudo systemctl restart postgresql
+sudo systemctl status  postgresql
+sudo -i -u postgres
+
+CREATE USER spark WITH PASSWORD 'spark@2024';
+
+CREATE DATABASE my_db;
+GRANT ALL PRIVILEGES ON DATABASE my_db TO spark;
+psql -h localhost -U spark -d my_db
+
+CREATE USER manu WITH PASSWORD 'manu@207';
+CREATE DATABASE demodb;
+GRANT ALL PRIVILEGES ON DATABASE demodb TO manu;
+
+psql -f /home/ubuntu/sample_db.sql
+
+psql -h 52.3.54.47 -U spark -d my_db
+
+pg_restore -U spark -d my_db auth_db.sql
+
+pg_restore -U spark -d my_db /tmp/auth_db.sql
+--------
+# on premeses
+pg_dump -h spark-dev-postgresql.cdem2iq4hmdp.us-east-1.rds.amazonaws.com -U dbuser -d sparkdevpostgresql -Fc -f sparkdevpostgresql.dump
+pg_restore -h localhost -U dbuser -d sparkdevpostgresql -Fc /home/ubuntu/sparkdevpostgresql.dump
+pg_restore --no-acl --no-owner -h localhost -U dbuser -d sparkdevpostgresql -Fc /home/ubuntu/sparkdevpostgresql.dump
+psql -h localhost -U dbuser -d sparkdevpostgresql
+
+------------------------------------------------
+
+# spark dev data base details
+Hostname:  spark-dev-postgresql.cdem2iq4hmdp.us-east-1.rds.amazonaws.com 
+Port: 5432 
+Username: dbuser 
+Password:  netsecpros2022! 
+Tunnel host: 54.175.82.11 
+Username: ubuntu 
+Password:  netsecpros2022!
+---------------------
+# spark stage data base details
+password: Jt5&T7p6HgmW
+spark-staging-postgresql.cdem2iq4hmdp.us-east-1.rds.amazonaws.com
+dbuser
+54.175.82.11
+ 
+-------------------------------------------------------------------------------
+
+
+psql -h spark-dev-postgresql.cdem2iq4hmdp.us-east-1.rds.amazonaws.com -U dbuser -d sparkdevpostgresql
+
+psql -h spark-dev-postgresql.cdem2iq4hmdp.us-east-1.rds.amazonaws.com -U dbuser -d securityscan
+
+--------------------------------------------------
+INSERT INTO public_test.netsecupload_nist_800_53
+SELECT * FROM public.netsecupload_nist_800_53;
+-----------------------------------------------
+INSERT INTO public_test.cve_mapping
+SELECT * FROM public.cve_mapping;
+
+--------------------------------------------------------
+du -sh *  file size 
+cve_match_criteria
+cve_nationalvulnerabilitydb
+cve_mapping
+
+cve_integration_cve_epss_mapping
+cve_integration_cve_cvss_mapping 
+cve_integration_cve_cisa_mapping
+ 
+pg_dump -h spark-dev-postgresql.cdem2iq4hmdp.us-east-1.rds.amazonaws.com -U dbuser -d securityscan -t public.netsecupload_nist_800_53 -Fc -f netsecupload_nist_800_53.dump
+
+pg_restore -h spark-dev-postgresql.cdem2iq4hmdp.us-east-1.rds.amazonaws.com -U dbuser -d securityscan -t public_test.netsecupload_nist_800_53 /home/ubuntu/netsecupload_nist_800_53.dump
+
+pg_restore -h spark-dev-postgresql.cdem2iq4hmdp.us-east-1.rds.amazonaws.com -U dbuser -d securityscan -t public_test.netsecupload_nist_800_53  -v /home/ubuntu/netsecupload_nist_800_53.dump
+--------------------------------
+pg_dump -h spark-dev-postgresql.cdem2iq4hmdp.us-east-1.rds.amazonaws.com -U dbuser -d securityscan -t public.cve_match_criteria -Fc -f cve_match_criteria.dump
+pg_restore -h spark-dev-postgresql.cdem2iq4hmdp.us-east-1.rds.amazonaws.com -U dbuser -d securityscan -t public_test.cve_match_criteria  -v /home/ubuntu/cve_match_criteria.dump
+
+pg_restore -h spark-dev-postgresql.cdem2iq4hmdp.us-east-1.rds.amazonaws.com -U dbuser -d securityscan --section=data -t public_test.cve_match_criteria  -v /home/ubuntu/cve_match_criteria.dump
+----------------------------
+pg_dump -h spark-dev-postgresql.cdem2iq4hmdp.us-east-1.rds.amazonaws.com -U dbuser -d securityscan -t public.cve_nationalvulnerabilitydb -Fc -f cve_nationalvulnerabilitydb.dump
+pg_restore -h spark-dev-postgresql.cdem2iq4hmdp.us-east-1.rds.amazonaws.com -U dbuser -d securityscan -t public_test.cve_nationalvulnerabilitydb /home/ubuntu/cve_nationalvulnerabilitydb.dump
+------------------------------
+pg_dump -h spark-dev-postgresql.cdem2iq4hmdp.us-east-1.rds.amazonaws.com -U dbuser -d securityscan -t public.cve_mapping -Fc -f cve_mapping.dump
+pg_restore -h spark-dev-postgresql.cdem2iq4hmdp.us-east-1.rds.amazonaws.com -U dbuser -d securityscan -t public_test.cve_mapping /home/ubuntu/cve_mapping.dump
+--------------------------------------
+pg_dump -h spark-dev-postgresql.cdem2iq4hmdp.us-east-1.rds.amazonaws.com -U dbuser -d securityscan -t public.cve_integration_cvss_version_master -Fc -f cve_integration_cvss_version_master.dump
+pg_restore -h spark-dev-postgresql.cdem2iq4hmdp.us-east-1.rds.amazonaws.com -U dbuser -d securityscan -t public_test.cve_integration_cvss_version_master /home/ubuntu/cve_integration_cvss_version_master.dump
+
+
+pg_restore -h spark-dev-postgresql.cdem2iq4hmdp.us-east-1.rds.amazonaws.com -U dbuser -d securityscan -t public_test.netsecupload_nist_800_53 -v /home/ubuntu/netsecupload_nist_800_53.dump
+
+
+pg_dump -h spark-dev-postgresql.cdem2iq4hmdp.us-east-1.rds.amazonaws.com -U dbuser -d sparkdevpostgresql -Fc -f sparkdevpostgresql.dump
+
+pg_restore -h localhost -U dbuser -d sparkdevpostgresql -Fc /home/ubuntu/sparkdevpostgresql.dump
+pg_restore --no-acl --no-owner -h localhost -U dbuser -d sparkdevpostgresql -Fc /home/ubuntu/sparkdevpostgresql.dump
+
+-------------------------------------------------------------------------------------------------
+pg_dump -h spark-dev-postgresql.cdem2iq4hmdp.us-east-1.rds.amazonaws.com -U dbuser -d securityscan -t public.cve_mapping -Fc -f cve_mapping.dump
+
+pg_dump -h spark-dev-postgresql.cdem2iq4hmdp.us-east-1.rds.amazonaws.com -U dbuser -d sparkdevpostgresql -t public.netsecupload_uploadfile -Fc -f netsecupload_uploadfile.dump
+
+netsecupload_uploadfile
+---------------------------------------------------------------------------------
+# Install PostgreSQL
+https://www.cherryservers.com/blog/how-to-install-and-setup-postgresql-server-on-ubuntu-20-04
+
+username postgres
+pwd Spark@2024
+
+vim /etc/postgresql/16/main/postgresql.conf
+
+vim /etc/postgresql/16/main/pg_hba.conf
+
+---------
+error  eficensdev2@eficensdev2:~$ sudo systemctl restart postgresql
+       Failed to allocate directory watch: Too many open files
+
+ulimit -n
+ulimit -n 65536
+
+
+sudo nano /etc/security/limits.conf
+*         soft    nofile      65536
+*         hard    nofile      65536
+
+sudo nano /etc/pam.d/common-session
+session required pam_limits.so
+
+sudo nano /etc/systemd/system.conf
+DefaultLimitNOFILE=65536
+
+sudo nano /etc/systemd/user.conf
+DefaultLimitNOFILE=65536
+sudo systemctl restart postgresql
+
+psql -h 192.168.1.100 -U postgresql -d demo
+
+10.123.105.7 192.168.49.1 192.168.58.1 172.17.0.1
+---------------------------------------------------------------
+# install opensearch 
+https://www.atlantic.net/dedicated-server-hosting/how-to-install-opensearch-on-ubuntu-22-04/
+------------------------------------------------------------------------------------------------
+# install redis 
+https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-20-04
+----------------------------------------------------------------------------------
+# install kafka 
+https://www.digitalocean.com/community/tutorials/how-to-install-apache-kafka-on-ubuntu-20-04
+user kafka
+pwd  kafka
+
+cd ~/kafka
+wget https://archive.apache.org/dist/kafka/3.4.0/kafka_2.13-3.4.0.tgz -P ~/Downloads/
+tar -xvzf ~/Downloads/kafka_2.13-3.4.0.tgz -C ~/kafka --strip 1
+-----------------------------------------------------------------------------------------
+
+
+
+
+31719
+---------------------------------------------------------------------------------------------------------------------
+#  How To Reach Apps Inside a Minikube / Kubernetes Cluster From a Windows 10 Host
+https://www.youtube.com/watch?v=5z3uXrFxN1k
+--------------------------------------------
+#kong 
+https://docs.konghq.com/gateway/3.7.x/install/docker/?install=oss
+# install postgres 
+CREATE USER kong WITH PASSWORD 'kong';
+CREATE DATABASE kong OWNER kong;
+GRANT ALL PRIVILEGES ON DATABASE kong TO kong;
+
+----------
+sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+ echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  sudo apt update
+   sudo apt install docker-ce -y
+ sudo systemctl status docker
+-------
+sudo docker network create kong-net
+sudo docker run -d --name kong-database \
+ --network kong-net \
+ -p 5432:5432 \
+ -e "POSTGRES_USER=kong" \
+ -e "POSTGRES_DB=kong" \
+ -e "POSTGRES_PASSWORD=kongpass" \
+ postgres:14
+
+sudo docker run --rm --network kong-net \
+-e "KONG_DATABASE=postgres" \
+-e "KONG_PG_HOST=kong-database" \
+-e "KONG_PG_PASSWORD=kongpass" \
+kong:3.7.1 kong migrations bootstrap
+
+sudo docker run -d --name kong-gateway \
+--network=kong-net \
+-e "KONG_DATABASE=postgres" \
+-e "KONG_PG_HOST=kong-database" \
+-e "KONG_PG_USER=kong" \
+-e "KONG_PG_PASSWORD=kongpass" \
+-e "KONG_PROXY_ACCESS_LOG=/dev/stdout" \
+-e "KONG_ADMIN_ACCESS_LOG=/dev/stdout" \
+-e "KONG_PROXY_ERROR_LOG=/dev/stderr" \
+-e "KONG_ADMIN_ERROR_LOG=/dev/stderr" \
+-e "KONG_ADMIN_LISTEN=0.0.0.0:8001,0.0.0.0:8444 ssl" \
+-e "KONG_ADMIN_GUI_URL=http://localhost:8002" \
+-p 8000:8000 \
+-p 8443:8443 \
+-p 127.0.0.1:8001:8001 \
+-p 127.0.0.1:8002:8002 \
+-p 127.0.0.1:8444:8444 \
+kong:3.7.1
+
+curl -i -X GET --url http://localhost:8001/services
+
+
+
+
+server {
+    listen 80;
+    server_name kong.eficensittest.com;
+
+    location /api/ {
+        rewrite ^/api/(.*) /$1 break;
+        proxy_pass http://localhost:8001;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        # Add other proxy settings as needed
+    }
+
+    location / {
+        proxy_pass http://localhost:8001;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        # Add other proxy settings as needed
+    }
+}
+
+
+
+Admin API: Provides a RESTful interface to manage Kong entities (like services, routes, and consumers).
+Kong Manager: Provides a web-based interface (dashboard) to manage and visualize the configuration and operations of Kong.
+
+-----------------------
+# adjustments
+sudo docker run -d --name kong-database \
+  --network kong-net \
+  -p 5433:5432 \
+  -e "POSTGRES_USER=kong" \
+  -e "POSTGRES_DB=kong" \
+  -e "POSTGRES_PASSWORD=kongpass" \
+  postgres:14
+
+sudo docker run -d --name kong-gateway \
+  --network=kong-net \
+  -e "KONG_DATABASE=postgres" \
+  -e "KONG_PG_HOST=kong-database" \
+  -e "KONG_PG_USER=kong" \
+  -e "KONG_PG_PASSWORD=kongpass" \
+  -e "KONG_PROXY_ACCESS_LOG=/dev/stdout" \
+  -e "KONG_ADMIN_ACCESS_LOG=/dev/stdout" \
+  -e "KONG_PROXY_ERROR_LOG=/dev/stderr" \
+  -e "KONG_ADMIN_ERROR_LOG=/dev/stderr" \
+  -e "KONG_ADMIN_LISTEN=0.0.0.0:8003,0.0.0.0:8444 ssl" \
+  -e "KONG_ADMIN_GUI_URL=http://localhost:8002" \
+  -p 8003:8001 \
+  -p 8445:8443 \
+  -p 127.0.0.1:8002:8002 \
+  -p 127.0.0.1:8445:8444 \
+  kong:3.7.1
+
+
+
+
+
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      tolerations:
+      - key: "node-role.kubernetes.io/control-plane"
+        operator: "Exists"
+        effect: "NoSchedule"
+      nodeSelector:
+        node-role.kubernetes.io/worker: worker
+      containers:
+      - name: nginx
+        image: nginx:1.21
+        ports:
+        - containerPort: 80
+---------------------------------------
+#service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: NodePort
+-----------------------------------
+# configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-system
+  name: config
+data:
+  config: |
+    address-pools:
+      - name: default
+        protocol: layer2
+        addresses:
+          - 10.123.105.7/24
+-----------------------------------
+cluster.name: opensearch-cluster
+network.host: 0.0.0.0
+http.port: 9200
+
+discovery.type: single-node
+node.name: ${HOSTNAME}
+
+plugins.security.disabled: false
+plugins.security.ssl.http.enabled: false
+Spark@2024
+
+
+#ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: spark-ui
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: spark.eficensittest.com
+    http:
+      paths:
+      - path: /spark-ui
+        pathType: Prefix
+        backend:
+          service:
+            name: spark-ui
+            port:
+              number: 80
+      - path: /spark-demo
+        pathType: Prefix
+        backend:
+          service:
+            name: spark-demo
+            port:
+              number: 80
+      - path: /spark-demo2
+        pathType: Prefix
+        backend:
+          service:
+            name: spark-demo2
+            port:
+              number: 80
+---------------------------------------------------------
+docker build -t manu207/flask-login-app .
+docker tag manu207/flask-login-app manu207/flask-login-app:v1.0
+docker push manu207/flask-login-app:v1.0
+docker run -p 5000:5000 manu207/flask-login-app:v1.0
+-----------------------------------------------
+Define Services in Kong
+# For authentication
+curl -X POST https://kong.eficensittest.com/api/services \
+  --data "name=authentication" \
+  --data "url=http://spark-authentication.spark.svc.cluster.local"
+ 
+# For spark-masterconfig
+curl -X POST https://kong.eficensittest.com/api/services \
+  --data "name=masterconfig" \
+  --data "url=http://spark-masterconfig.spark.svc.cluster.local"
+ 
+# For spark-securityscan
+curl -X POST https://kong.eficensittest.com/api/services \
+  --data "name=securityscan" \
+  --data "url=http://spark-securityscan.spark.svc.cluster.local"
+ 
+# For spark-scansearch
+curl -X POST https://kong.eficensittest.com/api/services \
+  --data "name=scansearch" \
+  --data "url=http://spark-scansearch.spark.svc.cluster.local"
+ 
+# For spark-eventsnotification
+curl -X POST https://kong.eficensittest.com/api/services \
+  --data "name=eventsnotification" \
+  --data "url=http://spark-eventsnotification.spark.svc.cluster.local"
+
+ 
+# For spark-scheduler
+curl -X POST https://kong.eficensittest.com/api/services \
+  --data "name=scheduler" \
+  --data "url=http://spark-scheduler.spark.svc.cluster.local"
+
+# For spark-fileprocess
+curl -X POST https://kong.eficensittest.com/api/services \
+  --data "name=fileprocess" \
+  --data "url=http://spark-fileprocess.spark.svc.cluster.local"
+
+curl -X DELETE https://kong.eficensittest.com/api/services/1f78a892-4bd1-47db-b395-f9e43de38076
+curl -X DELETE https://kong.eficensittest.com/api/services/efgh5678
+curl -X DELETE https://kong.eficensittest.com/api/services/ijkl9012
+curl -X DELETE https://kong.eficensittest.com/api/services/mnop3456
+curl -X DELETE https://kong.eficensittest.com/api/services/qrst7890
+curl -X DELETE https://kong.eficensittest.com/api/services/uvwx1234
+curl -X DELETE https://kong.eficensittest.com/api/services/yzab5678
+curl -X DELETE https://kong.eficensittest.com/api/services/cdef9012
+
+"1f78a892-4bd1-47db-b395-f9e43de38076"
+"5090213c-28fa-4150-8fa7-8d0c84bfcdb0"
+"7abceaea-ef9d-4a39-936f-543f4b6162aa"
+"a2cd2d74-3d02-4b49-8648-29813e0e4a12"
+"a8d96948-2ca6-48a1-81b8-a4e5a2b74749"
+"b9f28372-1c31-44cc-ab87-b89a1c8ea3f5"
+"f12de17e-cdae-4970-92ef-fcb3ee1d1359"
+-------------------------------------------------
+
+curl -X POST https://kong.eficensittest.com/api/routes \
+  --data "service.name=masterconfig" \
+  --data "methods[]=GET" \
+  --data "paths[]=/masterconfig"
+
+curl -X POST https://kong.eficensittest.com/api/routes \
+  --data "service.name=masterconfig" \
+  --data "methods[]=POST" \
+  --data "paths[]=/masterconfig/master-config-request"
+
+curl -X POST https://kong.eficensittest.com/api/routes \
+  --data "service.name=masterconfig" \
+  --data "methods[]=POST" \
+  --data "paths[]=/masterconfig/data-upload"
+
+-------------------------------------
+get /masterconfig
+post /masterconfig/master-config-request
+post /masterconfig/data-upload
+
+------------------------------------------
+
+kubectl exec -it spark-masterconfig-87cf5b786-sc4f4 -n spark -- curl -I http://spark-masterconfig.spark.svc.cluster.local/masterconfig
+
+
+
+curl -i -X GET https://kong.eficensittest.com/api/masterconfig
+
+kubectl exec -it spark-masterconfig-87cf5b786-sc4f4 -n spark -- curl -X POST http://spark-masterconfig.spark.svc.cluster.local/masterconfig/data-upload
+
+kubectl exec -it spark-masterconfig-87cf5b786-sc4f4 -n spark -- curl -X POST http://spark-masterconfig.spark.svc.cluster.local/masterconfig/master-config-request
+-----------------------------------------------------------------------------
+# delete routes
+curl -X DELETE https://kong.eficensittest.com/api/routes/f9c13210-4720-4a24-bed4-06b139d28744
+
+curl -s https://kong.eficensittest.com/api/routes | jq -r '.data[].id'
+curl -s https://kong.eficensittest.com/api/services | jq -r '.data[].id'
+
+
+
+-------------------------------------------------
+# individual micro service script
+#!/bin/bash
+
+BASE_URL="https://kong.eficensittest.com/api/routes"
+SERVICE_NAME="spark-authentication"
+
+# Function to create a route
+create_route() {
+  local method=$1
+  local path=$2
+  
+  curl -X POST $BASE_URL \
+    --data "service.name=$SERVICE_NAME" \
+    --data "methods[]=$method" \
+    --data "paths[]=$path"
+  
+  if [ $? -eq 0 ]; then
+    echo "Successfully created route: $path with method: $method"
+  else
+    echo "Failed to create route: $path with method: $method"
+  fi
+}
+
+# Define the routes
+routes=(
+  "GET /authentication"
+  "POST /authentication/sso-org	"
+  "GET /authentication/sso-org	"
+)
+
+# Create the routes
+for route in "${routes[@]}"; do
+  method=$(echo $route | awk '{print $1}')
+  path=$(echo $route | awk '{print $2}')
+  create_route $method $path
+done
+
+---------
+sudo chmod +x authentication.sh
+./authentication.sh	
+------------------------------------------------
+# for all micro service script
+
+#!/bin/bash
+
+BASE_URL="https://kong.eficensittest.com/api/routes"
+
+# Function to create a route
+create_route() {
+  local service_name=$1
+  local method=$2
+  local path=$3
+  
+  curl -X POST $BASE_URL \
+    --data "service.name=$service_name" \
+    --data "methods[]=$method" \
+    --data "paths[]=$path"
+  
+  if [ $? -eq 0 ]; then
+    echo "Successfully created route: $path with method: $method for service: $service_name"
+  else
+    echo "Failed to create route: $path with method: $method for service: $service_name"
+  fi
+}
+
+# Define the microservices and their routes
+microservices=(
+  "spark-authentication|GET /authentication|POST /authentication/sso-org|GET /authentication/sso-org"
+  "spark-masterconfig|GET /masterconfig|POST /masterconfig/master-config-request|POST /masterconfig/data-upload"
+  # Add more microservices and their routes here
+)
+
+# Create the routes for each microservice
+for microservice in "${microservices[@]}"; do
+  IFS='|' read -r -a parts <<< "$microservice"
+  service_name="${parts[0]}"
+  routes=("${parts[@]:1}")
+  
+  for route in "${routes[@]}"; do
+    method=$(echo $route | awk '{print $1}')
+    path=$(echo $route | awk '{print $2}')
+    create_route $service_name $method $path
+  done
+done
+------
+sudo chmod +x final.sh
+./final.sh
+-----------------------------------------------------------------------------------------------				
+
+# to resolve the CORS error 
+
+server {
+    listen 80;
+    server_name spark.eficensittest.com;
+
+    location / {
+        proxy_pass http://10.0.23.207:31589;  # Replace with your kubeadm cluster IP
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        add_header 'Access-Control-Allow-Origin' '*';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PUT, DELETE';
+        add_header 'Access-Control-Allow-Headers' 'Origin, Authorization, Content-Type, Accept';
+        add_header 'Access-Control-Allow-Credentials' 'true';
+
+        if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' '*';
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PUT, DELETE';
+            add_header 'Access-Control-Allow-Headers' 'Origin, Authorization, Content-Type, Accept';
+            add_header 'Access-Control-Allow-Credentials' 'true';
+            return 204;
+        }
+    }
+}
+
+server {
+    listen 80;
+    server_name kong.eficensittest.com;
+
+    location /api/ {
+        rewrite ^/api/(.*) /$1 break;
+        proxy_pass http://localhost:8001;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        add_header 'Access-Control-Allow-Origin' 'https://spark.eficensittest.com';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PUT, DELETE';
+        add_header 'Access-Control-Allow-Headers' 'Origin, Authorization, Content-Type, Accept';
+        add_header 'Access-Control-Allow-Credentials' 'true';
+
+        if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' 'https://spark.eficensittest.com';
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PUT, DELETE';
+            add_header 'Access-Control-Allow-Headers' 'Origin, Authorization, Content-Type, Accept';
+            add_header 'Access-Control-Allow-Credentials' 'true';
+            return 204;
+        }
+    }
+
+    location / {
+        proxy_pass http://localhost:8001;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        add_header 'Access-Control-Allow-Origin' 'https://spark.eficensittest.com';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PUT, DELETE';
+        add_header 'Access-Control-Allow-Headers' 'Origin, Authorization, Content-Type, Accept';
+        add_header 'Access-Control-Allow-Credentials' 'true';
+
+        if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' 'https://spark.eficensittest.com';
+            add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS, PUT, DELETE';
+            add_header 'Access-Control-Allow-Headers' 'Origin, Authorization, Content-Type, Accept';
+            add_header 'Access-Control-Allow-Credentials' 'true';
+            return 204;
+        }
+    }
+}
+
+# Globally:
+To apply the CORS plugin globally across all services and routes, you can create a global plugin configuration:
+ 
+curl -i -X POST https://kong.eficensittest.com/api/plugins \
+  --data "name=cors" \
+  --data "config.origins=https://spark.eficensittest.com" \
+  --data "config.methods=GET,POST,PUT,DELETE" \
+  --data "config.headers=Origin,Authorization,Content-Type,Accept" \
+  --data "config.exposed_headers=Origin,Authorization,Content-Type,Accept" \
+  --data "config.credentials=true" \
+  --data "config.max_age=3600"
+---------------------------
+
+curl -X POST https://kong.eficensittest.com/api/services \
+  --data "name=google" \
+  --data "url=https://google.com"
+
+curl -X POST https://kong.eficensittest.com/api/routes \
+  --data "service.name=google" \
+  --data "methods[]=GET" \
+  --data "paths[]=/maps"
+
+curl -X POST https://kong.eficensittest.com/api/routes \
+  --data "service.name=masterconfig" \
+  --data "methods[]=POST" \
+  --data "paths[]=/masterconfig/master-config-request"
+
+------------------------------------------------------------
+# For spark-masterconfig
+curl -X POST https://kong.eficensittest.com/api/services \
+  --data "name=masterconfig" \
+  --data "url=http://spark-masterconfig.spark.svc.cluster.local"
+
+
+
+curl -i -X GET https://kong.eficensittest.com/api/services/masterconfig/routes \
+  --data 'paths[]=/masterconfig' \
+  --data 'hosts[]=sparkbackend.eficensittest.com'
+
+curl -i -X POST https://kong.eficensittest.com/api/services/masterconfig/routes \
+  --data 'paths[]=/masterconfig/master-config-request' \
+  --data 'hosts[]=sparkbackend.eficensittest.com'
+
+curl -i -X POST https://kong.eficensittest.com/api/services/masterconfig/routes \
+  --data 'paths[]=/masterconfig/data-upload' \
+  --data 'hosts[]=sparkbackend.eficensittest.com'
+
+curl -X POST https://kong.eficensittest.com/api/routes \
+  --data "service.name=masterconfig" \
+  --data "methods[]=GET" \
+  --data "paths[]=/masterconfig"
+---------------------------------------
+1. ec2 privat subnet 
+2. connect with postges local ( cmd )
+3. ping ec2 private ip postgres port
+4. k8s deployment 
+5. host port dynamic allocation
+-----------------------------------
+
+# For spark-masterconfig
+curl -X POST https://kong.eficensittest.com/api/masterconfig \
+  --data "name=masterconfig" \
+  --data "url=http://spark-masterconfig.spark.svc.cluster.local"
+
+
+
+curl -i -X GET https://kong.eficensittest.com/api/masterconfig/routes \
+  --data 'paths[]=/masterconfig' \
+  --data 'hosts[]=sparkbackend.eficensittest.com'
+
+curl -i -X POST https://kong.eficensittest.com/api/masterconfig/routes \
+  --data 'paths[]=/masterconfig/master-config-request' \
+  --data 'hosts[]=sparkbackend.eficensittest.com'
+
+curl -i -X POST https://kong.eficensittest.com/api/services/masterconfig/routes \
+  --data 'paths[]=/masterconfig/data-upload' \
+  --data 'hosts[]=sparkbackend.eficensittest.com'
+
+curl -X POST https://kong.eficensittest.com/api/routes \
+  --data "service.name=masterconfig" \
+  --data "methods[]=GET" \
+  --data "paths[]=/masterconfig"
+-------------------------------
+
+curl -X POST https://kong.eficensittest.com/services \
+  --data "name=masterconfig" \
+  --data "url=http://sparkbackend.eficensittest.com"
+
+curl -X POST https://kong.eficensittest.com/routes \
+  --data "paths[]=/api/masterconfig" \
+  --data "service.name=masterconfig"
+----------------------------------
+
+curl -X POST https://kong.eficensittest.com/api/services \
+  --data "name=masterconfig" \
+  --data "url=http://10.104.19.208:31154"
+
+
+curl -X GET https://kong.eficensittest.com/api/services/masterconfig/routes \
+  --data "paths[]=/masterconfig" \
+  --data "hosts[]=sparkbackend.eficensittest.com"
+
+curl -X POST https://kong.eficensittest.com/api/services/masterconfig/routes \
+  --data "paths[]=/masterconfig/master-config-request" \
+  --data "hosts[]=sparkbackend.eficensittest.com"
+
+curl -X POST https://kong.eficensittest.com/api/services/masterconfig/routes \
+  --data "paths[]=/masterconfig/data-upload" \
+  --data "hosts[]=sparkbackend.eficensittest.com"
+-------------------------------------
+
+curl -X GET https://kong.eficensittest.com/api/services/masterconfig/routes \
+  --data "paths[]=/api/masterconfig" \
+  --data "hosts[]=sparkbackend.eficensittest.com"
+
+curl -X POST https://kong.eficensittest.com/api/services/masterconfig/routes \
+  --data "paths[]=/masterconfig/master-config-request" \
+  --data "hosts[]=sparkbackend.eficensittest.com"
+
+curl -X POST https://kong.eficensittest.com/api/services/masterconfig/routes \
+  --data "paths[]=/masterconfig/data-upload" \
+  --data "hosts[]=sparkbackend.eficensittest.com"
+
+
+---------------------------------------
+
+# For spark-masterconfig
+curl -X POST https://kong.eficensittest.com/api/masterconfig \
+  --data "name=masterconfig" \
+  --data "url=http://spark-masterconfig.spark.svc.cluster.local"
+
+curl -X GET https://kong.eficensittest.com/api/services/masterconfig/routes \
+  --data "paths[]=/masterconfig" \
+  --data "hosts[]=sparkbackend.eficensittest.com"
+
+curl -X POST https://kong.eficensittest.com/api/services/masterconfig/routes \
+  --data "paths[]=/masterconfig/master-config-request" \
+  --data "hosts[]=sparkbackend.eficensittest.com"
+
+curl -X POST https://kong.eficensittest.com/api/services/masterconfig/routes \
+  --data "paths[]=/masterconfig/data-upload" \
+  --data "hosts[]=sparkbackend.eficensittest.com"
+
+
+curl -X GET https://kong.eficensittest.com/api/services/masterconfig/routes \
+  --data "paths[]=/masterconfig" \
+  --data "hosts[]=spark-masterconfig.eficensittest.com"
+
+
+curl -X POST https://kong.eficensittest.com/api/routes \
+  --data "service.name=masterconfig" \
+  --data "methods[]=GET" \
+  --data "paths[]=/masterconfig"
+
+
+-----------------------------
+curl -X POST https://kong.eficensittest.com/api/masterconfig \
+  --data "name=masterconfig" \
+  --data "url=http://spark-masterconfig.spark.svc.cluster.local:80"
+
+curl -X POST https://kong.eficensittest.com/api/services/masterconfig/routes \
+  --data "paths[]=/masterconfig" \
+  --data "hosts[]=spark-masterconfig.eficensittest.com" \
+  --data "methods[]=GET"
+-----------------------------
+
+
+curl -i -X POST http://localhost:8001/routes \
+  --data "service.id=2e948742-e185-4058-80d9-b4a18cc65565" \
+  --data "paths[]=/api/masterconfig" \
+  --data "methods[]=GET" \
+  --data "strip_path=false" \
+  --data "preserve_host=true"
+
+curl -X POST http://localhost:8001/services \
+    --data "name=masterconfig" \
+    --data "url=http://10.104.19.208:80"
+
+
+
+curl -X POST http://localhost:8001/services \
+    --data "name=masterconfig" \
+    --data "url=http://10.0.23.207:31589"
+
+
+curl -X POST http://localhost:8001/routes \
+    --data "service.id=246ce3aa-9af4-40d0-be64-30e0970d053c" \
+    --data "paths[]=/api/masterconfig" \
+    --data "hosts[]=kong.eficensittest.com"
+-----------------------------------------------
+
+
+curl -X POST http://localhost:8001/services \
+  --data "name=spark-masterconfig" \
+  --data "url=http://spark-masterconfig.eficensittest.com"
+
+curl -X POST http://localhost:8001/routes \
+  --data "service.id=00b0b8ca-af4e-4a8d-a6ea-f2f8e971a520" \
+  --data "paths[]=/api/masterconfig" \
+  --data "hosts[]=kong.eficensittest.com"
+--------------------------------------------
+
+
+curl -i -X POST http://localhost:8001/services \
+  --data name=masterconfig \
+  --data url='http://spark-masterconfig.eficensittest.com'
+
+curl -i -X POST http://localhost:8001/services/masterconfig/routes \
+  --data 'hosts[]=spark-masterconfig.eficensittest.com' \
+  --data 'paths[]=/masterconfig'
+
+
+---------------------------------------------
+
+
+
+curl -i -s -X POST http://localhost:8001/services \
+ --data name=example_service \
+ --data url='http://httpbin.org'
+
+curl -X GET http://localhost:8001/services/example_service
+
+curl --request PATCH \
+ --url localhost:8001/services/example_service \
+ --data retries=6
+
+curl -X GET http://localhost:8001/services
+
+curl -i -X POST http://localhost:8001/services/example_service/routes \
+ --data 'paths[]=/mock' \
+ --data name=example_route
+
+curl -X GET http://localhost:8001/services/example_service/routes/example_route
+
+curl http://localhost:8001/routes
+
+curl -X GET http://localhost:8000/mock/anything
+
+
+conn cdbfb9ad-3e09-4c79-a1e3-eafc14c2c53e
+        auto=start
+        left=%defaultroute
+        leftid=3.234.164.216
+        right=14.194.144.198
+        type=tunnel
+        leftauth=psk
+        rightauth=psk
+        keyexchange=ikev2
+        ike=aes256-sha256-modp1024
+        ikelifetime=8h
+        esp=aes256-sha256-modp1024
+        lifetime=8h
+        keyingtries=%forever
+        leftsubnet=10.0.1.170/32
+        rightsubnet=192.168.50.0/23
+        dpddelay=10s
+        dpdtimeout=30s

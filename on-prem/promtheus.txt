@@ -1,0 +1,19 @@
+kubectl create namespace loki
+
+helm install loki grafana/loki-stack \
+    --namespace loki \
+    --set grafana.enabled=false \
+    --set promtail.enabled=false \
+    --set loki.config.table_manager.retention_deletes_enabled=true \
+    --set loki.config.table_manager.retention_period=168h
+
+helm install promtail grafana/promtail \
+    --namespace loki \
+    --set config.clients[0].url="http://loki.loki.svc.cluster.local:3100/loki/api/v1/push" \
+    --set config.serverPort=9080 \
+    --set config.server.logLevel="info"
+
+
+
+level=warn ts=2024-12-15T06:39:14.856205031Z caller=client.go:419 component=client host=loki.loki.svc.cluster.local:3100 msg="error sending batch, will retry" status=429 tenant= error="server returned HTTP status 429 Too Many Requests (429): Ingestion rate limit exceeded for user fake (limit: 4194304 bytes/sec) while attempting to ingest '7724' lines totaling '1048525' bytes, reduce log volume or contact your Loki administrator to see if the limit can be increased"
+level=warn ts=2024-12-15T06:39:16.194263693Z caller=client.go:419 component=client host=loki.loki.svc.cluster.local:3100 msg="error sending batch, will retry" status=429 tenant= error="server returned HTTP status 429 Too Many Requests (429): Ingestion rate limit exceeded for user fake (limit: 4194304 bytes/sec) while attempting to ingest '11340' lines totaling '1048520' bytes, reduce log volume or contact your Loki administrator to see if the limit can be increased

@@ -1,12 +1,12 @@
 enabled: true
 storageClassName: gp2
-adminPassword: Spark@123
+adminPassword: adfnd@123
 service:
   type: LoadBalancer
   annotations:
     service.beta.kubernetes.io/aws-load-balancer-type: "alb"  # Use "alb" for Application Load Balancer
     service.beta.kubernetes.io/aws-load-balancer-internal: "false"
-    service.beta.kubernetes.io/aws-load-balancer-subnets: "subnet-0023ff4bd4ab4e6e6,subnet-025a00cbb2e8f88ac,subnet-0adc595abd8d30780,subnet-0fe8e450bc917d52c"  # Combine subnets into a single string
+    service.beta.kubernetes.io/aws-load-balancer-subnets: ""  # Combine subnets into a single string
     service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"  # Set to "internal" for internal ALB
 datasources:
   datasources.yaml:

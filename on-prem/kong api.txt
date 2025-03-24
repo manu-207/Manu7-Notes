@@ -1,0 +1,713 @@
+# kong  Global plugins 
+
+curl -X POST http://localhost:8001/plugins \
+  --header "Content-Type: application/json" \
+  --data '{
+    "config": {
+      "origins": [
+        "*"
+      ],
+      "methods": [
+        "GET",
+        "HEAD",
+        "PUT",
+        "PATCH",
+        "POST",
+        "DELETE",
+        "OPTIONS",
+        "TRACE",
+        "CONNECT"
+      ],
+      "headers": [
+        "Accept",
+        "Accept-Version",
+        "Content-Length",
+        "Content-MD5",
+        "Content-Type",
+        "Date",
+        "X-Auth-Token"
+      ],
+      "exposed_headers": [
+        "X-Auth-Token"
+      ],
+      "credentials": false,
+      "preflight_continue": true,
+      "max_age": 3600
+    }
+  }'
+
+---------------------------------------------
+
+curl -X POST http://localhost:8001/plugins/ \
+   --header "accept: application/json" \
+   --header "Content-Type: application/json" \
+   --data '
+   {
+ "name": "cors",
+ "config": {
+   "origins": [
+     "*"
+   ],
+      "methods": [
+        "GET",
+        "HEAD",
+        "PUT",
+        "PATCH",
+        "POST",
+        "DELETE",
+        "OPTIONS",
+        "TRACE",
+        "CONNECT"
+   ],
+   "headers": [
+     "Accept",
+     "Accept-Version",
+     "Content-Length",
+     "Content-MD5",
+     "Content-Type",
+     "Date",
+     "X-Auth-Token"
+   ],
+   "exposed_headers": [
+     "X-Auth-Token"
+   ],
+   "credentials": false,
+   "max_age": 3600
+ }
+}
+   '
+
+
+
+
+
+-------------------------------------------------------------
+
+
+
+
+
+
+
+curl -i -X POST http://localhost:8001/services/masterconfig/plugins \
+--data "name=response-transformer" \
+--data "config.add.headers[]=Access-Control-Allow-Origin:https://spark.eficensittest.com" \
+--data "config.add.headers[]=Access-Control-Allow-Methods:GET,POST,OPTIONS" \
+--data "config.add.headers[]=Access-Control-Allow-Headers:Content-Type,Authorization,X-CSRF-Token" \
+--data "config.add.headers[]=Access-Control-Allow-Credentials:true"
+
+curl -i -X POST http://localhost:8001/services/scansearch/plugins \
+--data "name=response-transformer" \
+--data "config.add.headers[]=Access-Control-Allow-Origin:https://spark.eficensittest.com" \
+--data "config.add.headers[]=Access-Control-Allow-Methods:GET,POST,OPTIONS" \
+--data "config.add.headers[]=Access-Control-Allow-Headers:Content-Type,Authorization,X-CSRF-Token" \
+--data "config.add.headers[]=Access-Control-Allow-Credentials:true"
+
+curl -i -X POST http://localhost:8001/services/scheduler/plugins \
+--data "name=response-transformer" \
+--data "config.add.headers[]=Access-Control-Allow-Origin:https://spark.eficensittest.com" \
+--data "config.add.headers[]=Access-Control-Allow-Methods:GET,POST,OPTIONS" \
+--data "config.add.headers[]=Access-Control-Allow-Headers:Content-Type,Authorization,X-CSRF-Token" \
+--data "config.add.headers[]=Access-Control-Allow-Credentials:true"
+
+curl -i -X POST http://localhost:8001/services/securityscan/plugins \
+--data "name=response-transformer" \
+--data "config.add.headers[]=Access-Control-Allow-Origin:https://spark.eficensittest.com" \
+--data "config.add.headers[]=Access-Control-Allow-Methods:GET,POST,OPTIONS" \
+--data "config.add.headers[]=Access-Control-Allow-Headers:Content-Type,Authorization,X-CSRF-Token" \
+--data "config.add.headers[]=Access-Control-Allow-Credentials:true"
+
+curl -i -X POST http://localhost:8001/services/fileprocess/plugins \
+--data "name=response-transformer" \
+--data "config.add.headers[]=Access-Control-Allow-Origin:https://spark.eficensittest.com" \
+--data "config.add.headers[]=Access-Control-Allow-Methods:GET,POST,OPTIONS" \
+--data "config.add.headers[]=Access-Control-Allow-Headers:Content-Type,Authorization,X-CSRF-Token" \
+--data "config.add.headers[]=Access-Control-Allow-Credentials:true"
+
+curl -i -X POST http://localhost:8001/services/events-notifications/plugins \
+--data "name=response-transformer" \
+--data "config.add.headers[]=Access-Control-Allow-Origin:https://spark.eficensittest.com" \
+--data "config.add.headers[]=Access-Control-Allow-Methods:GET,POST,OPTIONS" \
+--data "config.add.headers[]=Access-Control-Allow-Headers:Content-Type,Authorization,X-CSRF-Token" \
+--data "config.add.headers[]=Access-Control-Allow-Credentials:true"
+
+curl -i -X POST http://localhost:8001/services/authentication/plugins \
+--data "name=response-transformer" \
+--data "config.add.headers[]=Access-Control-Allow-Origin:https://spark.eficensittest.com" \
+--data "config.add.headers[]=Access-Control-Allow-Methods:GET,POST,OPTIONS" \
+--data "config.add.headers[]=Access-Control-Allow-Headers:Content-Type,Authorization,X-CSRF-Token" \
+--data "config.add.headers[]=Access-Control-Allow-Credentials:true"
+---------------
+curl -i -X POST http://localhost:8001/services/secure-auth-login/plugins \
+--data "name=response-transformer" \
+--data "config.add.headers[]=Access-Control-Allow-Origin:https://spark.eficensittest.com" \
+--data "config.add.headers[]=Access-Control-Allow-Methods:GET,POST,OPTIONS" \
+--data "config.add.headers[]=Access-Control-Allow-Headers:Content-Type,Authorization,X-CSRF-Token" \
+--data "config.add.headers[]=Access-Control-Allow-Credentials:true"
+
+
+curl -i -X POST http://localhost:8001/services/secure-auth-password-change/plugins \
+--data "name=response-transformer" \
+--data "config.add.headers[]=Access-Control-Allow-Origin:https://spark.eficensittest.com" \
+--data "config.add.headers[]=Access-Control-Allow-Methods:GET,POST,OPTIONS" \
+--data "config.add.headers[]=Access-Control-Allow-Headers:Content-Type,Authorization,X-CSRF-Token" \
+--data "config.add.headers[]=Access-Control-Allow-Credentials:true"
+
+curl -i -X POST http://localhost:8001/services/secure-auth-logout/plugins \
+--data "name=response-transformer" \
+--data "config.add.headers[]=Access-Control-Allow-Origin:https://spark.eficensittest.com" \
+--data "config.add.headers[]=Access-Control-Allow-Methods:GET,POST,OPTIONS" \
+--data "config.add.headers[]=Access-Control-Allow-Headers:Content-Type,Authorization,X-CSRF-Token" \
+--data "config.add.headers[]=Access-Control-Allow-Credentials:true"
+
+curl -i -X POST http://localhost:8001/services/secure-auth-user-registration/plugins \
+--data "name=response-transformer" \
+--data "config.add.headers[]=Access-Control-Allow-Origin:https://spark.eficensittest.com" \
+--data "config.add.headers[]=Access-Control-Allow-Methods:GET,POST,OPTIONS" \
+--data "config.add.headers[]=Access-Control-Allow-Headers:Content-Type,Authorization,X-CSRF-Token" \
+--data "config.add.headers[]=Access-Control-Allow-Credentials:true"
+
+curl -i -X POST http://localhost:8001/services/secure-auth-password-validation/plugins \
+--data "name=response-transformer" \
+--data "config.add.headers[]=Access-Control-Allow-Origin:https://spark.eficensittest.com" \
+--data "config.add.headers[]=Access-Control-Allow-Methods:GET,POST,OPTIONS" \
+--data "config.add.headers[]=Access-Control-Allow-Headers:Content-Type,Authorization,X-CSRF-Token" \
+--data "config.add.headers[]=Access-Control-Allow-Credentials:true"
+
+curl -i -X POST http://localhost:8001/services/secure-auth-sso-login/plugins \
+--data "name=response-transformer" \
+--data "config.add.headers[]=Access-Control-Allow-Origin:https://spark.eficensittest.com" \
+--data "config.add.headers[]=Access-Control-Allow-Methods:GET,POST,OPTIONS" \
+--data "config.add.headers[]=Access-Control-Allow-Headers:Content-Type,Authorization,X-CSRF-Token" \
+--data "config.add.headers[]=Access-Control-Allow-Credentials:true"
+
+curl -i -X POST http://localhost:8001/services/secure-auth-authentication/plugins \
+--data "name=response-transformer" \
+--data "config.add.headers[]=Access-Control-Allow-Origin:https://spark.eficensittest.com" \
+--data "config.add.headers[]=Access-Control-Allow-Methods:GET,POST,OPTIONS" \
+--data "config.add.headers[]=Access-Control-Allow-Headers:Content-Type,Authorization,X-CSRF-Token" \
+--data "config.add.headers[]=Access-Control-Allow-Credentials:true"
+
+curl -i -X POST http://localhost:8001/services/secure-auth-token/plugins \
+--data "name=response-transformer" \
+--data "config.add.headers[]=Access-Control-Allow-Origin:https://spark.eficensittest.com" \
+--data "config.add.headers[]=Access-Control-Allow-Methods:GET,POST,OPTIONS" \
+--data "config.add.headers[]=Access-Control-Allow-Headers:Content-Type,Authorization,X-CSRF-Token" \
+--data "config.add.headers[]=Access-Control-Allow-Credentials:true"
+
+curl -i -X POST http://localhost:8001/services/secure-auth-decrypt/plugins \
+--data "name=response-transformer" \
+--data "config.add.headers[]=Access-Control-Allow-Origin:https://spark.eficensittest.com" \
+--data "config.add.headers[]=Access-Control-Allow-Methods:GET,POST,OPTIONS" \
+--data "config.add.headers[]=Access-Control-Allow-Headers:Content-Type,Authorization,X-CSRF-Token" \
+--data "config.add.headers[]=Access-Control-Allow-Credentials:true"
+
+curl -i -X POST http://localhost:8001/services/secure-auth-encrypt/plugins \
+--data "name=response-transformer" \
+--data "config.add.headers[]=Access-Control-Allow-Origin:https://spark.eficensittest.com" \
+--data "config.add.headers[]=Access-Control-Allow-Methods:GET,POST,OPTIONS" \
+--data "config.add.headers[]=Access-Control-Allow-Headers:Content-Type,Authorization,X-CSRF-Token" \
+--data "config.add.headers[]=Access-Control-Allow-Credentials:true"
+-------------------------
+
+curl -i -X POST http://localhost:8001/plugins \
+     --data "name=cors" \
+     --data "config.origins=*" \
+     --data "config.methods=GET,POST,OPTIONS" \
+     --data "config.headers=Authorization,Content-Type,X-CSRF-Token" \
+     --data "config.exposed_headers=Authorization,Content-Type,X-CSRF-Token" \
+     --data "config.credentials=true" \
+     --data "config.max_age=3600"
+
+-----------------------------------------------------------------------
+url:  https://docs.konghq.com/hub/kong-inc/cors/how-to/basic-example/
+
+# enable globally
+
+curl -X POST http://localhost:8001/plugins/ \
+   --header "accept: application/json" \
+   --header "Content-Type: application/json" \
+   --data '
+   {
+ "name": "cors",
+ "config": {
+   "origins": [
+     "*"
+   ],
+   "methods": [
+     "GET",
+     "POST"
+   ],
+   "headers": [
+     "Accept",
+     "Accept-Version",
+     "Content-Length",
+     "Content-MD5",
+     "Content-Type",
+     "Date",
+     "X-Auth-Token"
+   ],
+   "exposed_headers": [
+     "X-Auth-Token"
+   ],
+   "credentials": true,
+   "max_age": 3600
+ }
+}
+   '
+-------------------
+# enable on service
+
+curl -X POST http://localhost:8001/services/{serviceName|Id}/plugins \
+   --header "accept: application/json" \
+   --header "Content-Type: application/json" \
+   --data '
+   {
+ "name": "cors",
+ "config": {
+   "origins": [
+     "https://spark.eficensittest.com"
+   ],
+   "methods": [
+     "GET",
+     "POST"
+   ],
+   "headers": [
+     "Accept",
+     "Accept-Version",
+     "Content-Length",
+     "Content-MD5",
+     "Content-Type",
+     "Date",
+     "X-Auth-Token"
+   ],
+   "exposed_headers": [
+     "X-Auth-Token"
+   ],
+   "credentials": true,
+   "max_age": 3600
+ }
+}
+   '
+---------------
+
+# enable on route
+
+curl -X POST http://localhost:8001/routes/30586a5a-6956-45bc-bcc6-fd6eb84459f1/plugins \
+   --header "accept: application/json" \
+   --header "Content-Type: application/json" \
+   --data '
+   {
+ "name": "cors",
+ "config": {
+   "origins": [
+     "https://spark.eficensittest.com"
+   ],
+   "methods": [
+     "GET",
+     "POST"
+   ],
+   "headers": [
+     "Accept",
+     "Accept-Version",
+     "Content-Length",
+     "Content-MD5",
+     "Content-Type",
+     "Date",
+     "X-Auth-Token"
+   ],
+   "exposed_headers": [
+     "X-Auth-Token"
+   ],
+   "credentials": true,
+   "max_age": 3600
+ }
+}
+   '
+
+
+
+
+
+# crating all services 
+
+curl -i -s -X POST http://localhost:8001/services \
+--data name=masterconfig \
+--data url='http://spark-masterconfig.eficensittest.com/masterconfig'
+
+
+curl -i -s -X POST http://localhost:8001/services \
+--data name=authentication \
+--data url='http://spark-authentication.eficensittest.com/authentication'
+
+curl -i -s -X POST http://localhost:8001/services \
+--data name=events-notifications \
+--data url='http://spark-eventsnotification.eficensittest.com/events-notifications'
+
+curl -i -s -X POST http://localhost:8001/services \
+--data name=fileprocess \
+--data url='http://spark-fileprocess.eficensittest.com/fileprocess'
+
+curl -i -s -X POST http://localhost:8001/services \
+--data name=scansearch \
+--data url='http://spark-scansearch.eficensittest.com/scansearch'
+
+curl -i -s -X POST http://localhost:8001/services \
+--data name=scheduler \
+--data url='http://spark-scheduler.eficensittest.com/scheduler'
+
+curl -i -s -X POST http://localhost:8001/services \
+--data name=securityscan \
+--data url='http://spark-securityscan.eficensittest.com/securityscan'
+---------------------------------------------------------------------------------------
+
+curl -i -s -X POST http://localhost:8001/services \
+--data name=secure-auth-login \
+--data url='http://spark-authentication.eficensittest.com/secure-auth/login'
+
+curl -i -s -X POST http://localhost:8001/services \
+--data name=secure-auth-password-change \
+--data url='http://spark-authentication.eficensittest.com/secure-auth/password/change'
+
+
+
+curl -i -s -X POST http://localhost:8001/services \
+--data name=secure-auth-user-registration \
+--data url='http://spark-authentication.eficensittest.com/secure-auth/user-registration'
+
+curl -i -s -X POST http://localhost:8001/services \
+--data name=secure-auth-password-validation \
+--data url='http://spark-authentication.eficensittest.com/secure-auth/password-validation'
+
+
+curl -i -s -X POST http://localhost:8001/services \
+--data name=secure-auth-token \
+--data url='http://spark-authentication.eficensittest.com/secure-auth/token'
+
+curl -i -s -X POST http://localhost:8001/services \
+--data name=secure-auth-decrypt \
+--data url='http://spark-authentication.eficensittest.com/secure-auth/decrypt'
+
+curl -i -s -X POST http://localhost:8001/services \
+--data name=secure-auth-authentication \
+--data url='http://spark-authentication.eficensittest.com/secure-auth/authentication'
+
+curl -i -s -X POST http://localhost:8001/services \
+--data name=secure-auth-logout \
+--data url='http://spark-authentication.eficensittest.com/secure-auth/logout'
+
+curl -i -s -X POST http://localhost:8001/services \
+--data name=secure-auth-sso-login \
+--data url='http://spark-authentication.eficensittest.com/secure-auth/sso-login'
+
+
+curl -i -s -X POST http://localhost:8001/services \
+--data name=secure-auth-encrypt \
+--data url='http://spark-authentication.eficensittest.com/secure-auth/encrypt'
+
+-----------------------------------------------------------------------------------------
+# unable to create service
+
+curl -i -s -X POST http://localhost:8001/services \
+--data name=secure-auth-change-password-encodedpk-token \
+--data url='http://spark-authentication.eficensittest.com/secure-auth/change-password/{encoded_pk}/{token}'
+
+
+|POST /secure-auth/change-password/{encoded_pk}/{token}
+---------------------------------
+
+
+secure-auth-password-change |POST /secure-auth/password/change
+
+secure-auth-logout |POST /secure-auth/logout|GET /secure-auth/logout|
+
+secure-auth-user-registration |POST /secure-auth/user-registration
+
+secure-auth-password-validation |POST /secure-auth/password-validation
+
+secure-auth-sso-login |POST /secure-auth/sso-login
+
+
+secure-auth-login |POST /secure-auth/login
+
+secure-auth-authentication |POST /secure-auth/authentication
+---------------
+secure-auth-token |POST /secure-auth/token
+
+secure-auth-decrypt |ANY /secure-auth/decrypt
+
+secure-auth-encrypt |POST /secure-auth/encrypt
+
+
+ #"secure-auth|POST /secure-auth/password/change|POST /secure-auth/change-password/{encoded_pk}/{token}|POST /secure-auth/logout|GET /secure-auth/logout|POST /secure-auth/user-registration|POST /secure-auth/password-validation|POST /secure-auth/sso-login|POST /secure-auth/encrypt|POST /secure-auth/login|POST /secure-auth/token|ANY /secure-auth/decrypt|POST /secure-auth/authentication"
+
+
+
+-------------------------------------------------------------
+
+
+
+curl -i -s -X POST http://localhost:8001/services \
+--data name=secure-auth-logout \
+--data url='http://spark-authentication.eficensittest.com/secure-auth/logout'
+
+curl -i -s -X POST http://localhost:8001/services \
+--data name=secure-auth-spark-login \
+--data url='http://spark-authentication.eficensittest.com/secure-auth/login'
+
+curl -i -s -X POST http://localhost:8001/services/secure-auth-spark-login/routes \
+--data 'paths[]=/secure-auth/login' \
+--data methods=POST
+
+
+
+curl -i -s -X POST http://localhost:8001/services/secure-auth-login/routes \
+--data 'paths[]=/secure-auth/login' \
+--data methods=POST
+
+
+
+  #"secure-scan|POST /secure-scan/api-onboard|POST /secure-scan/ssh-upload"
+
+
+
+
+
+
+curl -i -s -X POST http://localhost:8001/services/masterconfig/routes \
+--data 'paths[]=/masterconfig/data-upload' \
+--data name=spark_route_data_upload \
+--data methods=POST
+
+curl -i -s -X POST http://localhost:8001/services/authentication/routes \
+--data 'paths[]=/secure-auth/token' \
+--data name=spark_route_secure_auth_token \
+--data methods=POST
+
+
+
+
+
+
+
+
+curl --request PATCH \
+--url http://localhost:8001/services/masterconfig \
+--data retries=6
+
+curl -i -X POST http://localhost:8001/services/masterconfig/routes \
+--data 'paths[]=/masterconfig' \
+--data name=spark_route
+
+curl -X GET http://localhost:8000/masterconfig
+
+curl -X GET http://spark-masterconfig.eficensittest.com/masterconfig
+
+curl -I http://localhost:8000/masterconfig
+curl -I http://spark-masterconfig.eficensittest.com/masterconfig
+
+--------------------------------------------
+curl -i -s -X POST http://localhost:8001/services/masterconfig/routes \
+--data 'paths[]=/masterconfig' \
+--data name=spark_route_masterconfig
+
+curl -i -s -X POST http://localhost:8001/services/masterconfig/routes \
+--data 'paths[]=/masterconfig/master-config-request' \
+--data name=spark_route_master_config_request \
+--data methods=POST
+
+curl -i -s -X POST http://localhost:8001/services/masterconfig/routes \
+--data 'paths[]=/masterconfig/data-upload' \
+--data name=spark_route_data_upload \
+--data methods=POST
+
+
+
+get /masterconfig
+post /masterconfig/master-config-request
+post /masterconfig/data-upload
+-------------------------------------------------
+
+curl -i -s -X POST https://kong.eficensittest.com/api/services \
+--data name=masterconfig \
+--data url='http://spark-masterconfig.eficensittest.com/masterconfig'
+
+curl --request PATCH \
+--url https://kong.eficensittest.com/api/services/masterconfig \
+--data retries=6
+
+curl -i -X POST https://kong.eficensittest.com/api/services/masterconfig/routes \
+--data 'paths[]=/masterconfig' \
+--data name=spark_route
+
+curl -X GET https://kong.eficensittest.com/api/masterconfig
+curl -I http://spark-masterconfig.eficensittest.com/masterconfig
+
+
+docker run --rm --network container:72e4d8286935 curlimages/curl:latest curl -I https://kong.eficensittest.com/api/masterconfig
+docker run --rm curlimages/curl:latest curl -I https://kong.eficensittest.com/api/masterconfig
+docker run --rm --network container:72e4d8286935 curlimages/curl:latest curl -I http://spark-masterconfig.eficensittest.com/masterconfig
+
+
+
+#!/bin/bash
+
+BASE_URL="https://kong.eficensittest.com/api/routes"
+
+# Function to create a route
+create_route() {
+  local service_name=$1
+  local method=$2
+  local path=$3
+  
+  curl -X POST $BASE_URL \
+    --data "service.name=$service_name" \
+    --data "methods[]=$method" \
+    --data "paths[]=$path"
+  
+  if [ $? -eq 0 ]; then
+    echo "Successfully created route: $path with method: $method for service: $service_name"
+  else
+    echo "Failed to create route: $path with method: $method for service: $service_name"
+  fi
+}
+
+# Define the microservices and their routes
+microservices=(
+  "authentication|GET /authentication|POST /authentication/sso-org|GET /sso|GET /sso/microsoft/redirect|POST /secure-auth/password/change|POST /secure-auth/change-password/{encoded_pk}/{token}|POST /secure-auth/logout|GET /secure-auth/logout|POST /secure-auth/user-registration|POST /secure-auth/password-validation|POST /secure-auth/sso-login|POST /secure-auth/encrypt|POST /secure-auth/login|POST /secure-auth/token|ANY /secure-auth/decrypt|POST /secure-auth/authentication|GET /authentication/sso-org|POST /authentication/roles-devices-event|POST /authentication/update-org-user|POST /authentication/org-data-delete|POST /authentication/region-data|POST /authentication/delete-device|GET /authentication/global-filter-region|POST /authentication/authentication|GET /authentication/sso-master|GET /authentication/user-thumbnail|GET /authentication/mute-notification|POST /authentication/user-signup-resend-email|GET /authentication/user-details|POST /authentication/user-details|POST /authentication/edit-org|GET /authentication/drop-down-region|POST /authentication/invite-users|POST /authentication/global-filter-Ldata|GET /authentication/global-filter-Ldata|POST /authentication/role-permissions|POST /authentication/global-regions|GET /authentication/list-region-data/{region_label_id}/{parent_id}|POST /authentication/region-labels|POST /authentication/roles|GET /authentication/roles/{str:role_id}|POST /authentication/sso|POST /authentication/delete-role|POST /authentication/user-registration|GET /authentication/user-registration/{str:encoded_pk}/{str:token}|GET /authentication/resend-email|GET /authentication/resend-email/{str:encoded_pk}/{str:token}|GET /authentication/socket-user-list|POST /authentication/socket-user-list|GET /authentication/data-retrieve-edb|GET /authentication/role-regions|POST /authentication/role-regions|POST /authentication/encrypt-response|POST /authentication/logout|GET /authentication/logout|GET /authentication/org-image|POST /authentication/device-region-names|POST /authentication/password|POST /authentication/password/change|POST /authentication/role_device_update|GET /authentication/email-verification|POST /authentication/forgot-password|POST /authentication/org-backup|POST /authentication/user-activation|POST /authentication/region-names|POST /authentication/password-validate|POST /authentication/update-org-subscription|GET /authentication/parent-org|POST /authentication/update-roles-permissions|POST /authentication/org-user-ids|GET /authentication/user-image|GET /authentication/user-token-validation-request|GET /authentication/user-retrieve-edb|GET /authentication/deleted-data-sync|GET /authentication/list-region-labels|GET /authentication/roles-and-permissions|POST /authentication/all-regions|GET /authentication/role-devices|POST /authentication/role-devices|POST /authentication/decommission-auth|POST /authentication/change-password/{str:encoded_pk}/{str:token}|GET /authentication/subscription-plans|POST /authentication/password-reset|POST /authentication/permissions|POST /authentication/org-users|POST /authentication/org-registration|GET /authentication/user-token-validation|GET /authentication/token-validation/{str:encoded_pk}/{str:token}|GET /authentication/user-permissions|GET /authentication/roles-retrieve-edb|POST /authentication/filter-data|GET /authentication/org-thumbnail|POST /authentication/login|POST /authentication/edit-user|POST /authentication/org-roles|POST /authentication/get-users-list|POST /authentication/common-details|POST /authentication/delete-user|GET /authentication/admin_details|POST /authentication/token|POST /authentication/save-filters|GET /authentication/org-details|POST /authentication/org-restore|POST /authentication/org-pic-upload|POST /authentication/update-user-role|POST /authentication/role-name|POST /authentication/user-pic-upload|POST /authentication/search-org-users"
+  "masterconfig|GET /masterconfig|POST /masterconfig/master-config-request|POST /masterconfig/data-upload"
+  "eventsnotification|ANY /events-notifications|POST /events-notifications/notifications|GET /events-notifications/seen-notification|GET /events-notifications/bell-notification-count|GET /events-notifications/read-notification|POST /events-notifications/file-upload"
+  "fileprocess|GET /fileprocess/get-devices-count|POST /fileprocess/process-queue|GET /fileprocess"
+  "scansearch|GET /scansearch|GET /scansearch/get-index-data|GET /scansearch/datasync-es-scan-device-request|GET /scansearch/datasync-es-users-request|GET /scansearch/datasync-es-scan-summary-request|GET /scansearch/datasync-es-benchmarks-request|POST /scansearch/module-search|POST /scansearch/search|POST /scansearch/org-data-delete|POST /scansearch/scan-summary-ids|GET /scansearch/datasync-es-parameters-request|GET /scansearch/datasync-es-roles-request|POST /scansearch/searchengine|GET /scansearch/delete-data-sync"
+  "scheduler|GET /scheduler|POST /scheduler/save-schedules"
+  #"secure-auth|POST /secure-auth/password/change|POST /secure-auth/change-password/{encoded_pk}/{token}|POST /secure-auth/logout|GET /secure-auth/logout|POST /secure-auth/user-registration|POST /secure-auth/password-validation|POST /secure-auth/sso-login|POST /secure-auth/encrypt|POST /secure-auth/login|POST /secure-auth/token|ANY /secure-auth/decrypt|POST /secure-auth/authentication"
+  #"secure-scan|POST /secure-scan/api-onboard|POST /secure-scan/ssh-upload"
+  "securityscan|GET /securityscan|DELETE /securityscan/schedule_scan|POST /secure-scan/api-onboard|POST /secure-scan/ssh-upload|POST /securityscan/schedule_scan|POST /securityscan/region-based-devices|POST /securityscan/device-parameter-scan-log|POST /securityscan/cancel-rescan|GET /securityscan/whitelist-user|POST /securityscan/asset-summary-data|GET /securityscan/schedule-tooltip|GET /securityscan/get-devices-count|GET /securityscan/device-details|POST /securityscan/move-scans|GET /securityscan/crendtial_devices_list|POST /securityscan/crendtial_devices_list|GET /securityscan/cve/cve-dropdown
+
+
+
+|GET /securityscan/cve/sync_epss|GET /securityscan/cve/graph|POST /securityscan/cve/search_cve|GET /securityscan/cve/search_cve|GET /securityscan/cve/affected_assets|GET /securityscan/cve/sync_cpe|GET /securityscan/cve/cve_summary|POST /securityscan/cve/cve_summary|GET /securityscan/cve/vulnerability|GET /securityscan/cve/api_count|POST /securityscan/cve/af_list_filter_get|GET /securityscan/cve/sync_nvd|POST /securityscan/cve/af_list|GET /securityscan/cve/vs_vulnerability|GET /securityscan/cve/sync_cisa|GET /securityscan/my-scans|GET /securityscan/whitelist_main_filters|POST /securityscan/asset-credentials|GET /securityscan/asset-credentials|PUT /securityscan/asset-credentials|DELETE /securityscan/asset-credentials/{str:cred_id}|GET /securityscan/asset-credentials/{str:cred_id}|POST /securityscan/es-deleted-data|GET /securityscan/whitelist-history|GET /securityscan/decommissioned-devices|POST /securityscan/decommissioned-devices|POST /securityscan/scan-summary|POST /securityscan/devices-list-od|POST /securityscan/asset-compliance-report|GET /securityscan/asset-compliance-report
+
+
+
+
+|POST /securityscan/asset-sum-report|POST /securityscan/delete-device|POST /securityscan/device-list|GET /securityscan/security_info_filters|POST /securityscan/scheduler-call-api|POST /securityscan/dashboard-cyber-resilience-trend|POST /securityscan/rescan-with-cred|POST /securityscan/file-upload-temp|GET /securityscan/recalculate-score|POST /securityscan/recalculate-score|GET /securityscan/search_cve|POST /securityscan/search_cve|GET /securityscan/vulnerable-values|POST /securityscan/global-filt-vend-cate|GET /securityscan/global-filt-vend-cate|GET /securityscan/whitelist-graphs|POST /securityscan/daily-score|GET /securityscan/dashboard-regionwise-overall|POST /securityscan/stack-scan-history|POST /securityscan/api-onboard|POST /securityscan/daily-event-data|POST /securityscan/whitelist_history_details|POST /securityscan/af_list_filter_get|GET /securityscan/af_list_filter_get|POST /securityscan/dashboard-regionwise|POST /securityscan/cancel-schedule|POST /securityscan/dashboard-category|POST /securityscan/scaned-device-parameters|POST /securityscan/scan-common-details|GET /securityscan/asset-summary-report|POST /securityscan/asset-summary-report|GET /securityscan/decom-dev-list|POST /securityscan/ssh-upload|POST /securityscan/dashboard-devicesnotscaned|POST /securityscan/asset-credential-mapping|GET /securityscan/dashboard-vulnerabilities|POST /securityscan/device-region|GET /securityscan/credential-types|GET /securityscan/dev_ven_cat|POST /securityscan/process-uploads|POST /securityscan/asset-compliance-data|POST /securityscan/file-chunks|POST /securityscan/dashboard-myscans|GET /securityscan/dashboard-myscans
+
+
+
+|POST /securityscan/scan-summary-details|GET /securityscan/schedule-dropdown|GET /securityscan/whitelist_sub_filters|POST /securityscan/list-regions|POST /securityscan/global-filter-device-list|GET /securityscan/compare-device-list|POST /securityscan/dashboard-commonvul|POST /securityscan/device-management-vul|GET /securityscan/update-dev-list|POST /securityscan/scan-user-search|GET /securityscan/scan-user-search|POST /securityscan/ssh_upload|POST /securityscan/white-list|GET /securityscan/vendors-list|POST /securityscan/global-devices-filter|POST /securityscan/devices-dropdown-list|POST /securityscan/cyber-resilience-trend|GET /securityscan/schedule-info|GET /securityscan/master-data|GET /securityscan/dashboard-data|GET /securityscan/es-scan-summary-request|GET /securityscan/duration-dropdown|POST /securityscan/scan-status|POST /securityscan/masterdata-update|POST /securityscan/config-new-file-differ|GET /securityscan/dashboard-security-score|GET /securityscan/schedule_frequency|POST /securityscan/process-queue|GET /securityscan/benchmark-values|POST /securityscan/saving-data|GET /securityscan/es-benchmarks-request|GET /securityscan/es-parameters-request|POST /securityscan/device-management-device|POST /securityscan/decommission-recommission|POST /securityscan/param-device-list|GET /securityscan/sample-file-download|POST /securityscan/dashboard-devices|GET /securityscan/schedule-asset-popup|POST /securityscan/rename-scan|GET /securityscan/dashboard-region-dropdown|POST /securityscan/global-filter-device|POST /securityscan/params-security-info|POST /securityscan/whitelisted-params|GET /securityscan/device-count|GET /securityscan/dashboard-duration-dropdown|POST /securityscan/dashboard-commonvul-hover|GET /securityscan/dashboard-devices-dropdown|GET /securityscan/device-summary|POST /securityscan/scan-device-list|GET /securityscan/es-cve-request|GET /securityscan/dashboard-commonvul-dropdown|POST /securityscan/ssh-multi-upload|GET /securityscan/schedule-frequency|GET /securityscan/device_management_filters|POST /securityscan/filtered-devices|POST /securityscan/scaned-device-dates|POST /securityscan/rescan|POST /securityscan/config-file-differ|POST /securityscan/scan-history|GET /securityscan/scheduled_myscans|POST /securityscan/api_onboard|PUT /securityscan/schedule-scan|DELETE /securityscan/schedule-scan|POST /securityscan/schedule-scan|GET /securityscan/scan-device-summary|GET /securityscan/scan-summary-output|GET /securityscan/flag-for-scan-db|POST /securityscan/security-information-params|POST /securityscan/file-upload|POST /securityscan/pdlist|GET /securityscan/scheduled-assets|POST /securityscan/whitelisted-devices|POST /securityscan/assert-credential-mapping|POST /securityscan/latest-scan-date|GET /securityscan/scheduled-myscans|GET /securityscan/es-scan-device-request"
+  #"sso|GET /sso|GET /sso/microsoft/redirect"
+  "o|POST /o|POST /o/token/{token}"
+  
+  # Add more microservices and their routes here
+)
+
+# Create the routes for each microservice
+for microservice in "${microservices[@]}"; do
+  IFS='|' read -r -a parts <<< "$microservice"
+  service_name="${parts[0]}"
+  routes=("${parts[@]:1}")
+  
+  for route in "${routes[@]}"; do
+    method=$(echo $route | awk '{print $1}')
+    path=$(echo $route | awk '{print $2}')
+    create_route $service_name $method $path
+  done
+done
+
+----------------------------------------------------------
+  #"sso|GET /sso|GET /sso/microsoft/redirect"-------------------> not required
+
+  #"secure-scan|POST /secure-scan/api-onboard|POST /secure-scan/ssh-upload" --------- not required 
+
+#"secure-auth|POST /secure-auth/password/change|POST /secure-auth/change-password/{encoded_pk}/{token}|POST /secure-auth/logout|GET /secure-auth/logout|POST /secure-auth/user-registration|POST /secure-auth/password-validation|POST /secure-auth/sso-login|POST /secure-auth/encrypt|POST /secure-auth/login|POST /secure-auth/token|ANY /secure-auth/decrypt|POST /secure-auth/authentication"
+
+
+curl -X POST http://localhost:8001/services/secure-auth-login/plugins/ \
+  --header "accept: application/json" \
+  --header "Content-Type: application/json" \
+  --data '
+  {
+    "name": "cors",
+    "config": {
+      "origins": ["*"],
+      "methods": ["GET", "POST"],
+      "headers": ["Accept", "Accept-Version", "Content-Length", "Content-MD5", "Content-Type", "Date", "X-Auth-Token"],
+      "exposed_headers": ["X-Auth-Token"],
+      "credentials": true,
+      "max_age": 3600
+    }
+  }'
+
+
+
+
+curl -X POST http://localhost:8001/routes/{route}/plugins/ \
+  --header "accept: application/json" \
+  --header "Content-Type: application/json" \
+  --data '
+  {
+    "name": "cors",
+    "config": {
+      "origins": ["*"],
+      "methods": ["GET", "POST"],
+      "headers": ["Accept", "Accept-Version", "Content-Length", "Content-MD5", "Content-Type", "Date", "X-Auth-Token"],
+      "exposed_headers": ["X-Auth-Token"],
+      "credentials": true,
+      "max_age": 3600
+    }
+  }'
+
+
+
+
+curl -H "Origin: https://spark.eficensittest.com" \
+     -H "Access-Control-Request-Method: POST" \
+     -H "Access-Control-Request-Headers: Authorization, Content-Type" \
+     -X OPTIONS http://localhost:8000/secure-auth/login -I
+
+
+curl -H "Origin: https://spark.eficensittest.com" \
+     -H "Access-Control-Request-Method: POST" \
+     -H "Access-Control-Request-Headers: Authorization, Content-Type" \
+     -X OPTIONS https://kong.eficensittest.com/api/secure-auth/login -I
+
+
+curl -H "Origin: https://spark.eficensittest.com" \
+     -H "Access-Control-Request-Method: POST" \
+     -H "Access-Control-Request-Headers: Authorization, Content-Type" \
+     -H "Authorization: Bearer gUzYETKrA95c2tZhqgxBRpmWk3IAJC" \
+     -X OPTIONS https://kong.eficensittest.com/api/secure-auth/login -I
+
+curl -H "Origin: https://spark.eficensittest.com" \
+     -H "Access-Control-Request-Method: POST" \
+     -H "Access-Control-Request-Headers: Authorization, Content-Type" \
+     -H "Authorization: Bearer gUzYETKrA95c2tZhqgxBRpmWk3IAJC" \
+     -X POST https://kong.eficensittest.com/api/secure-auth/login -I
+
+curl -H "Origin: https://spark.eficensittest.com" \
+     -H "Content-Type: application/json" \
+     -X POST https://kong.eficensittest.com/api/secure-auth/login -d '{"username":"A086RagfG90Z9NtuttT3rSv5VT/gSgY0ueHWx8i3+o4mXoz2fTCuqnVMXsnDjC7Cck3N2EMHXJwIqeruxkN6+FEhyXB0q2kZc31wO8ooyFOPk0KNkNEfS+LUGNao+F3Mvh/Q11OExgU2jDlQMV5CJJ6eATUU4UlVgKgvKpfFhZI/XZiFJzk6gXJzcZKXBRpaRciAO+BoeuLGMtpKDK6FyusbBt9xYnfE7awNwU/seonluuIu/u0I9U7AksiYF9htvTvWua9cFMhfu+C62+PO4tZtkdodOMkhghvOeHeQaG4GCsDF7+2ZcBnu6VP6lLZy1SFpLMCqqXPZleZtIhCBoA==", "password":"GpcuR+lSkE7wcgAZn6pnpr7zeINggYtPhIyU24RqmSDLENTPJ4xH1fr2n07Vc5N9usqO1p0XM68i7okATCbpD/6KY9FNUI8XEYlfiEXK68bGJJosbJSMyAt+ZLITVYiqXUCznDajABWpEEyQNagW5juc/9GTK4NTiou9rzJIrXrvSiOs2lRjnRNaeainjvlW+uQShb4NiJ1HyFNa0fWQzceFZYZMR6CVAc6MHmxGzPDBaoVbWm6q0shLSqfTv9cGs4kZ+R1MDP8wt66+3V7d/YhV2JggQLmcvmSwyF5BxmfGphT5mb3iZAN8KtE1CDHQQslE2S9C4rFfqqYi8sKdyQ=="}'
+
+curl -H "Origin: https://spark.eficensittest.com" \
+     -H "Content-Type: application/json" \
+     -H "Access-Control-Request-Method: POST" \
+     -H "Access-Control-Request-Headers: Authorization, Content-Type" \
+     -H "Authorization: Bearer gUzYETKrA95c2tZhqgxBRpmWk3IAJC" \
+     -X POST https://kong.eficensittest.com/api/secure-auth/login -d '{"username":"A086RagfG90Z9NtuttT3rSv5VT/gSgY0ueHWx8i3+o4mXoz2fTCuqnVMXsnDjC7Cck3N2EMHXJwIqeruxkN6+FEhyXB0q2kZc31wO8ooyFOPk0KNkNEfS+LUGNao+F3Mvh/Q11OExgU2jDlQMV5CJJ6eATUU4UlVgKgvKpfFhZI/XZiFJzk6gXJzcZKXBRpaRciAO+BoeuLGMtpKDK6FyusbBt9xYnfE7awNwU/seonluuIu/u0I9U7AksiYF9htvTvWua9cFMhfu+C62+PO4tZtkdodOMkhghvOeHeQaG4GCsDF7+2ZcBnu6VP6lLZy1SFpLMCqqXPZleZtIhCBoA==", "password":"GpcuR+lSkE7wcgAZn6pnpr7zeINggYtPhIyU24RqmSDLENTPJ4xH1fr2n07Vc5N9usqO1p0XM68i7okATCbpD/6KY9FNUI8XEYlfiEXK68bGJJosbJSMyAt+ZLITVYiqXUCznDajABWpEEyQNagW5juc/9GTK4NTiou9rzJIrXrvSiOs2lRjnRNaeainjvlW+uQShb4NiJ1HyFNa0fWQzceFZYZMR6CVAc6MHmxGzPDBaoVbWm6q0shLSqfTv9cGs4kZ+R1MDP8wt66+3V7d/YhV2JggQLmcvmSwyF5BxmfGphT5mb3iZAN8KtE1CDHQQslE2S9C4rFfqqYi8sKdyQ=="}'
+
+
+ curl -s http://localhost:8001/plugins
+
+6. Fallback Option: Custom Plugin or Middleware
+If the issue persists, consider adding a custom plugin or middleware to explicitly handle OPTIONS requests and send the appropriate CORS headers.
+7. Test with Curl
+Manually test the OPTIONS request using curl to isolate whether the issue is with the browser or Kong:
+bash
+Copy code
+curl -X OPTIONS https://kong.eficensittest.com/api/secure-auth/login \
+  -H "Origin: https://spark.eficensittest.com" \
+  -H "Access-Control-Request-Method: POST" \
+  -H "Access-Control-Request-Headers: Authorization, Content-Type"
+
+6309750805

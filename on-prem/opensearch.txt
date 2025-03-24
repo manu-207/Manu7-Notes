@@ -1,0 +1,97 @@
+# docker-compose.yaml 
+
+version: '3.7'
+services:
+  opensearch:
+    image: opensearchproject/opensearch:latest
+    container_name: opensearch-node
+    environment:
+      - cluster.name=opensearch-cluster
+      - node.name=opensearch-node
+      - plugins.security.disabled=true  # Ensure security is disabled if not needed
+      - network.host=0.0.0.0
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Netsecpros2022!
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    ports:
+      - 9200:9200
+      - 9600:9600
+    networks:
+      - opensearch-net
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:latest
+    container_name: opensearch-dashboards
+    ports:
+      - 5601:5601
+    environment:
+      - OPENSEARCH_HOSTS=http://opensearch-node:9200
+      - OPENSEARCH_DASHBOARDS_DEFAULT_APP_ID=home  # Optional: Set default app if needed
+    networks:
+      - opensearch-net
+
+volumes:
+  opensearch-data:
+
+networks:
+  opensearch-net:
+---------
+docker-compose down
+docker-compose up -d 
+curl -X GET "http://localhost:9200"
+curl -X GET "http://10.0.23.207:9200"
+--------
+# opensearch dashboard 
+
+curl -X GET "http://10.0.23.207:5601"
+curl -X GET "http://54.161.150.49:5601"
+---------------------------------------------------
+elasticdump \
+  --input=https://vpc-sparkscansearch-itl5daycg7ggkzbo7ozyp2hgv4.us-east-1.es.amazonaws.com/ \
+  --output=dump.json \
+  --type=data \
+  --input-username=manu \
+  --input-password=Manu@5718
+
+-----------------------
+
+elasticdump \
+  --input=/home/ubuntu/dump.json \
+  --output=http://10.0.23.207:9200/ \
+  --type=data
+
+-----------------------------------------------------------------------------
+# Check cluster health
+curl http://10.0.23.207:9200/_cluster/health?pretty
+
+# List indices
+curl http://10.0.23.207:9200/_cat/indices?v
+
+# Search documents in an index
+curl http://10.0.23.207:9200/my_index/_search?pretty
+
+# Count documents in an index
+curl http://10.0.23.207:9200/my_index/_count?pretty
+
+# Check the index mapping
+curl http://10.0.23.207:9200/my_index/_mapping?pretty
+
+
+curl -X DELETE "http://10.0.23.207:9200/myindex"
+
+
+
+
+
+
+
